@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
+    <h1 style="color:blue;">Welcome to Sentiment Analysis App</h1>
+    <h2 style="color:green;">(Copy and paste your text below to perform sentiment Analysis)</h2>
+    <form action = "/" method="get">
+	<textarea name='textdata' type='text' id='my-text-box' class="textarea" >  </textarea>
+	<input href="#" class="myButton" input type = "submit " value="Submit"></input>
+	</form>
+	<h3 style="color:blue;">How to intrepret the scores !</h3>
+	<h4>The App returns a score from -1.0 to +1.0 ranging from most negative to positive sentiment</h4>
+</body>
+</html>
+
