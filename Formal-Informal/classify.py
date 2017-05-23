@@ -37,6 +37,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.datasets import make_blobs
 import gc
 from sklearn import svm
+from scipy.sparse import coo_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
 
 def MyRandomForest(X_train, y_train):
     clf = RandomForestClassifier()
@@ -49,13 +54,13 @@ def MyRandomForest(X_train, y_train):
 def MyDecisionTree(X_train, y_train):
     clf = DecisionTreeClassifier(min_samples_split=2,random_state=0)
     param_grid = {'max_depth': [1,5,10,25,50,75,100,500]}
-    classifier= GridSearchCV(estimator=clf, cv=3 ,param_grid=param_grid)
+    classifier= GridSearchCV(estimator=clf, cv=5 ,param_grid=param_grid)
     classifier.fit(X_train, y_train)
     return classifier.cv_results_
 
 def MyExtraTreeClassifier(X_train, y_train):
     clf = ExtraTreesClassifier(min_samples_split=2, random_state=0,max_depth = 10)
-    param_grid = {'n_estimators': [10,20,30,50]}
+    param_grid = {'n_estimators': [10,20,30,50,75,100],'max_depth': [1,5,10,25,50,75,100]}
     #param_grid = {'max_depth': [1,5,10,25,50,75,100,500,1000,2000]}
     classifier= GridSearchCV(estimator=clf, cv=3 ,param_grid=param_grid)
     classifier.fit(X_train, y_train)
@@ -74,7 +79,7 @@ def Mylinear_svm(X_train, y_train):
     linear_svc = svm.SVC(kernel='linear')#,decision_function_shape ='ovo'/'ovr'
     param_grid = {'C': np.logspace(-3, 2, 6)}
     #param_grid = {'C': [ 0.1]}
-    classifier= GridSearchCV(estimator=linear_svc, cv=3 ,param_grid=param_grid)
+    classifier= GridSearchCV(estimator=linear_svc, cv=5 ,param_grid=param_grid)
     y_train= np.array(y_train)
     classifier.fit(X_train, y_train)
     return classifier.cv_results_
@@ -92,6 +97,25 @@ if __name__ == "__main__":
     feature_matrix = joblib.load('feature_matrix.pkl')
     X = feature_matrix[0]
     y = feature_matrix[1]
+    #print X[1:100]
     X_train, X_test, y_train, y_test=train_test_split(X,y ,test_size=0.2, random_state=5677)
+    """
+    output = MyExtraTreeClassifier(X_train,y_train)
+    #print output
+    print "Mean Train score"
+    print output['mean_train_score']
+    print "Mean Test score"
+    print output['mean_test_score']
+    """
+    #clf = ExtraTreesClassifier(min_samples_split=2, random_state=0,max_depth=70,n_estimators=50)
+    #clf = DecisionTreeClassifier(min_samples_split=2,random_state=0,max_depth =10)
+    #clf = RandomForestClassifier(n_estimators =500)
+    clf =svm.SVC(kernel='linear',C=10000)
+    clf.fit(X_train, y_train)
+    out =clf.predict(X_test)
+    print "Accuracy:" +str(accuracy_score(y_test,out))
+    print "F1 score: "+str(f1_score(y_test,out, average='macro'))
+    print "Percision: " + str(precision_score(y_test,out, average='macro'))
+    print "Recall: " +str(recall_score(y_test,out, average='macro'))
     #print (X[1:100])
     #print (y[1:100])
