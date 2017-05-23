@@ -23,23 +23,36 @@ class ExtractFeature(object):
 		self.abbriviations_list = self.read_abbreviation_wordlist()
 
 	def get_matching_score(self,str_tokens,word_list):
-	    freq_count = 0
-	    for word in str_tokens:
-	        if word in word_list:
-	            #print("=======" ,word)
-	            freq_count += 1
-	    return float(freq_count)/(1+len(str_tokens))
+		freq_count = 0
+		"""
+		for sentence in nltk.sent_tokenize(str_tokens) :
+			parsed = parser(sentence)
+			for word in parsed:
+				print str(word)
+				if str(word) in word_list:
+		            #print("=======" ,word)
+					freq_count += 1
+		"""
+		parsed = str_tokens.split()
+		for word in parsed:
+			#print str(word)
+			if str(word) in word_list:
+		            #print("=======" ,word)
+				freq_count += 1
+		return float(freq_count)/(1+len(parsed))
 
 	def get_word_length_avg(self,str_tokens):
-	    average = sum(len(word) for word in str_tokens) / float(1+len(str_tokens))
-	    return average
+		parsed = str_tokens.split()
+		average = sum(len(word) for word in str_tokens) / float(1+len(parsed))
+		return average
 
 	def TTR(self,str_tokens):
-	    tokens_set = set(str_tokens)
-
-	    return float(len(tokens_set))/(1+len(str_tokens)) 
+		parsed = str_tokens.split()
+		tokens_set = set(parsed)
+		return float(len(tokens_set))/(1+len(parsed)) 
 
 	def phrasal_verb_recognizer(self,newsText) :
+		temp = newsText.split()
 		phrasal =0
 		for sentence in nltk.sent_tokenize(newsText) :
 
@@ -51,10 +64,10 @@ class ExtractFeature(object):
 					phrasal +=1
 					particle = token.orth_
 
-		return phrasal
+		return float(phrasal)/(1+len(temp))
 
 	def active_passive_voice_recognizer(self,newsText) :
-
+		temp = newsText.split()
 		active = 0
 		passive = 0
 		for sentence in nltk.sent_tokenize(newsText) :
@@ -72,6 +85,8 @@ class ExtractFeature(object):
 					verb = token.head.orth_
 					nsubject = token.orth_
 					active +=1
+		passive = float(passive)/(1+len(temp))
+		active = float(active)/(1+len(temp))			
 		return passive,active
 
 
@@ -96,12 +111,13 @@ class ExtractFeature(object):
 	def process_create_feature(self,str_tokens):
 
 		#documents = read_data("testData.txt")
-		"""
-		formal_list = self.read_formal_wordlist("formal")
-		informal_list = self.read_formal_wordlist("informal")
-		contractions_list = self.read_contraction_wordlist()
-		abbriviations_list = self.read_abbreviation_wordlist()
-		"""
+	
+		self.formal_list = self.read_formal_wordlist("formal")
+		self.informal_list = self.read_formal_wordlist("informal")
+		self.contractions_list = self.read_contraction_wordlist()
+		self.abbriviations_list = self.read_abbreviation_wordlist()
+		
+
 		#doc = u'Alex posted the video on facebook.  The picture was also posted by Ada. '
 		#Feature 1 Formal
 		formal_score = self.get_matching_score(str_tokens,self.formal_list)
@@ -125,8 +141,8 @@ class ExtractFeature(object):
 		return [formal_score,informal_score,contraction_score,abbriviations_score,passive,active,phrasal,word_length_average,TTR_feature]
 
 if __name__ == "__main__":
-	temp = ExtractFeature('/Users/Dhanush/Documents/Deeplearn/generating-reviews-discovering-sentiment/ClassificationFeatures/')
-	print temp.process_create_feature(u'Tell me about it')
+	temp = ExtractFeature('/Users/Dhanush/Desktop/EnronDataSetAnalysis/Formal-Informal/ClassificationFeatures/')
+	print temp.process_create_feature(u"Tell me about it. You should break up approximately not be doing it. The Systems better were executed. etc. i will do it. can't do it")
 
 
 
