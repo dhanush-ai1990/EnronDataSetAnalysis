@@ -92,5 +92,6 @@ if __name__ == "__main__":
     feature_matrix = joblib.load('feature_matrix.pkl')
     X = feature_matrix[0]
     y = feature_matrix[1]
-    print (X[1:100])
-    print (y[1:100])
+    X_train, X_test, y_train, y_test=train_test_split(X,y ,test_size=0.2, random_state=5677)
+    #print (X[1:100])
+    #print (y[1:100])

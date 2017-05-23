@@ -206,7 +206,7 @@ for news in twenty_X_train:
 
 # Load the Tweets !
 print ("Procesing Tweets")
-twitter_dataset = '/Users/Dhanush/Desktop/tweets.txt'
+twitter_dataset = '/Users/Dhanush/Desktop/EnronDataSetAnalysis/Datasets/tweets.txt'
 train_data_informal = []
 f = open(twitter_dataset,'r')
 lines = f.read().splitlines()
@@ -276,7 +276,7 @@ print ("It took " + str(load_time) + ' seconds to load the data. Now extracting 
 print ('---------------------------------------------------')
 #Call ExtractFeature to get the feature matrix.
 
-FeatureExtractor = ExtractFeature('/Users/Dhanush/Documents/Deeplearn/generating-reviews-discovering-sentiment/ClassificationFeatures/')
+FeatureExtractor = ExtractFeature('/Users/Dhanush/Desktop/EnronDataSetAnalysis/Formal-Informal/ClassificationFeatures/')
 
 feature_matrix = []
 count = 0

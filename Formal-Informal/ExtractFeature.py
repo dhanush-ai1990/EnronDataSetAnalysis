@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import spacy
 import nltk
 import sys
@@ -36,9 +37,11 @@ class ExtractFeature(object):
 		parsed = str_tokens.split()
 		for word in parsed:
 			#print str(word)
-			if str(word) in word_list:
-		            #print("=======" ,word)
-				freq_count += 1
+			try:
+				if word in word_list:
+					freq_count += 1
+			except UnicodeDecodeError:
+				print ('Exception')
 		return float(freq_count)/(1+len(parsed))
 
 	def get_word_length_avg(self,str_tokens):
