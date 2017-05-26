@@ -21,11 +21,12 @@ breach of contract.  Sources state that if the legislature does not pass the\
  bridge loan legislation by May 8th, having a bond issuance by July 1st will\
  be very difficult.']
 """
-"""
-text = ['Bahah I can see your whole history \
-Including the parts where you debated separating the chat you invited me to because I would make off with your technical papers \
-Real nice']
-"""
+
+text = ['Dear Julia, According the our meeting from last week, I want thank you for being so enthuastic. \
+	I found your drive very helpful. \
+	It is a good thing that you are bossy and take the lead often. \
+	Thank you and goodbye.']
+
 text_features = model.transform(text)
 print (text_features.shape)
 print (text_features)

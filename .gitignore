@@ -8,3 +8,11 @@
 *.csv
 
 *.csv
+
+*.db
+
+*.db-journal
+
+*.pkl
+
+*.sql
