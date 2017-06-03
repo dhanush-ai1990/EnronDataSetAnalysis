@@ -17,14 +17,7 @@ import cStringIO
 # of an error in time stamps. It looks for the already updated messages and prevents the
 #same from being processed
 
-Database = sqlite3.connect('Enron_database.db')
-c = Database.cursor()
-SQL = "select distinct msgid from 'Enron Prime'"
-c.execute(SQL)
-exists = []
-for row in c:
-	exists.append(row[0])
-Database.close()
+D 
 
 
 # Query the entire Enron tables messages and fetch all message Id's.
@@ -50,6 +43,8 @@ for message in message_id_list:
 	if message not in exists:
 		temp_id.append(message)
 message_id_list = temp_id
+
+print message_id_list
 print ("Total number of emails for processing: ") + str(len(message_id_list))
 
 
@@ -223,8 +218,10 @@ for msg in message_id_list:
 		values = ', '.join(map(str, data_buffer_cache))
 		data_buffer_cache =[]
 		#Insert the buffer into the SQL TABLE
+
 		SQL = "INSERT INTO 'ENRON PRIME' VALUES {}".format(values)
 		c.execute(SQL)
+		Database.commit()
 		processed +=1
 
 		#print ("Processed " + str(processed) +" out of " + str(len(message_id_list))) 
