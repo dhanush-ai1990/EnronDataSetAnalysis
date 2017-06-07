@@ -9,6 +9,7 @@ from sklearn.externals import joblib
 from utils import HParams, preprocess, iter_data
 
 global nloaded
+
 nloaded = 0
 
 
@@ -71,7 +72,7 @@ def mlstm(inputs, c, h, M, ndim, scope='lstm', wn=False):
         i = tf.nn.sigmoid(i)
         f = tf.nn.sigmoid(f)
         o = tf.nn.sigmoid(o)
-        u = tf.tanh(u)
+        u = tf.tanh(u,name="myTanh")
         if M is not None:
             ct = f*c + i*u
             ht = o*tf.tanh(ct)
@@ -149,15 +150,33 @@ class Model(object):
         M = tf.placeholder(tf.float32, [None, hps.nsteps, 1])
         S = tf.placeholder(tf.float32, [hps.nstates, None, hps.nhidden])
         cells, states, logits = model(X, S, M, reuse=False)
-
+        print (cells)
+        print (states)
+        print (logits)
         sess = tf.Session()
         #tf.initialize_all_variables().run(session=sess)
+        trainable_var_key = tf.GraphKeys.TRAINABLE_VARIABLES
+        act=tf.get_collection_ref(trainable_var_key)
         tf.global_variables_initializer().run(session=sess)
+
         def seq_rep(xmb, mmb, smb):
+            activations(xmb, mmb, smb)
             return sess.run(states, {X: xmb, M: mmb, S: smb})
 
         def seq_cells(xmb, mmb, smb):
+            
             return sess.run(cells, {X: xmb, M: mmb, S: smb})
+
+        def activations(xmb, mmb, smb):
+            print ("At activations")
+            print (np.asarray(sess.run(act, {X: xmb, M: mmb, S: smb}))[4].shape)
+            for op in sess.graph.get_operations(): 
+                if op.name == 'model/myTanh_63':
+                    print (op.values())
+            #for v in tf.global_variables():
+            #    print (v.name)
+            #var_23 = [v for v in tf.global_variables() if v.name == "myTanh"]
+            #print (var_23)
 
         def transform(xs):
             tstart = time.time()

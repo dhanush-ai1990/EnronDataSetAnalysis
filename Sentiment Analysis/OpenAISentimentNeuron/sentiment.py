@@ -20,18 +20,22 @@ hat the bond issuance happen by July 1, 2001.  If not, the state may be in \
 breach of contract.  Sources state that if the legislature does not pass the\
  bridge loan legislation by May 8th, having a bond issuance by July 1st will\
  be very difficult.']
-"""
+
 
 text = ['Dear Julia, According the our meeting from last week, I want thank you for being so enthuastic. \
 	I found your drive very helpful. \
 	It is a good thing that you are bossy and take the lead often. \
 	Thank you and goodbye.']
-
+"""
+text = ["good"]
 text_features = model.transform(text)
 print (text_features.shape)
-print (text_features)
 
-#17.660 seconds to transform 8 examples
+
+
+print (len(text))
+
 for i in range(len(text)):
+
 	sentiment = text_features[i, 2388]
-print(text[i],sentiment)
+	print(text[i],sentiment)

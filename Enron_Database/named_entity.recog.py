@@ -28,6 +28,11 @@ import urlparse
 #from urllib3 import HTTPError
 #from urllib3 import URLError
 import json
+
+
+org_coded_list = ['Citibank']
+
+
 def chunks(s, n):
     """Produce `n`-character chunks from `s`."""
     for start in range(0, len(s), n):
@@ -166,7 +171,7 @@ for data in c:
 	#print msgid
     subject = re.sub("[^a-zA-Z]", "", data[2]) 
 	#body =re.sub("[^a-zA-Z]", " ", data[1])
-    print "*********************************"
+    #print "*********************************"
     data1= data[1].split('-----Original Message-----')[0]
     body = clean(data1)
     fixed =[]
@@ -176,6 +181,7 @@ for data in c:
 
     	
     	if(not results["LightGingerTheTextResult"]):
+
     		print("Good English :)")
     	color_gap, fixed_gap = 0, 0
     	for result in results["LightGingerTheTextResult"]:
@@ -193,7 +199,8 @@ for data in c:
     			color_gap += gap
     			fixed_gap += to_index-from_index-len(suggest)
     	fixed.append(fixed_text)
-    fixed_body= " ".join(fixed)
+    fixed_body=map(unicode,fixed)
+    fixed_body= " ".join(fixed_body)
     """
     print "-------------------------------------------"
     print "Original Text"
@@ -202,6 +209,11 @@ for data in c:
     print "Corrected Text"
     print fixed_body
     """
+    #print data[1]
+    #print "   "
+    #print fixed_body
+    if len(fixed_body) < 2:
+        continue
     doc = nlp(fixed_body)
 
     for ent in doc.ents:
@@ -217,11 +229,16 @@ for data in c:
             if ent.text.isalpha():
     	       temp_place.append(ent.text)
 
+        if ent.text in org_coded_list:
+            if ent.text.isalpha():
+                temp_org.append(ent.text)
+
+
 
     for sentence in nltk.sent_tokenize(fixed_body) :
     	parsed = parser(sentence)
-    	for token in parsed :
-    		if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
+        for token in parsed :
+            if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
                 if token.text.isalpha():
                     all_nouns.append(token.text)
     	#print np.text
@@ -234,14 +251,25 @@ for data in c:
 
 
 
-    if count >20:
+    if count >100:
     	break
 
 temp_place= list(set(temp_place) & set(all_nouns))
 temp_org= list(set(temp_org) & set(all_nouns))
 temp_person= list(set(temp_person) & set(all_nouns))
 
+name_place_org = set(temp_person + temp_place + temp_org)
+all_nouns = set(all_nouns)
+all_nouns.difference_update(name_place_org)
+
+print "Organizations"
 print temp_org
+print "Places"
+print temp_place
+print "People"
+print temp_person
+print "Interest and Expertise"
+#print all_nouns
 """
 #=================================================		
 

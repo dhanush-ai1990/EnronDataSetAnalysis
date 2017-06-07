@@ -10,7 +10,7 @@ def hello():
 
 @app.route('/', methods=['GET', 'POST'])
 
-def doSentimentAnalysis():
+def doSentimentAnalysis(request):
 	print ("Here")
 	if request.method == "GET":
 		Text = request.form.get('textdata')
