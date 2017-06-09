@@ -1,3 +1,4 @@
+#from __future__ import print_function  # In python 2.
 #This program is mainly aimed at doing named entity recognition.
 
 
@@ -9,6 +10,15 @@ import re
 #from sklearn.externals import joblib
 #import cs
 #import cStringIO
+import sqlite3
+import json
+import sys
+import requests
+from bs4 import BeautifulSoup
+import json
+import urllib2
+from HTMLParser import HTMLParser
+import sqlite3
 import spacy
 import nltk
 from nltk.corpus import stopwords
@@ -31,7 +41,18 @@ import json
 
 
 org_coded_list = ['Citibank']
-
+def check_for_babelnet_entry(word):
+    #URL = 'http://live.babelnet.org/search?word='+word+'&lang=EN'
+    #URL ='http://babelnet.org/search?word='+word+'&lang=EN'
+    URL = 'https://babelnet.io/v4/getSenses?word='+word+'&lang=EN&source=WIKI&key=eeb2340a-5060-4770-8a80-cc306222ab31'
+    session = requests.session()
+    login_response = session.get(URL)
+    soup = BeautifulSoup(login_response.text, "html.parser")
+    Output=json.loads(str(soup))
+    if len(Output) <1:
+        return "Not Found"
+    else:
+        return "found"
 
 def chunks(s, n):
     """Produce `n`-character chunks from `s`."""
@@ -159,12 +180,19 @@ temp_others = []
 temp_product = []
 proper_nouns =[]
 all_nouns =[]
-
+corrected_text ={}
+all_words = []
 for data in c:
-    print count
+
+    if count >100:
+        break
+    print "Processing Email: " +str(count)
+    count+=1
 	#file_to_write = file_out + str(file_number) + '.txt'
 	#output = open(file_to_write, "w")
+
     msgid = str(data[0])
+    corrected_text[msgid] = []
 	#print msgid
 	#print data[1]
 	#print "*********************************"
@@ -181,8 +209,8 @@ for data in c:
 
     	
     	if(not results["LightGingerTheTextResult"]):
-
-    		print("Good English :)")
+            filler =0
+    		#print("Good English :)")
     	color_gap, fixed_gap = 0, 0
     	for result in results["LightGingerTheTextResult"]:
     		if(result["Suggestions"]):
@@ -201,33 +229,25 @@ for data in c:
     	fixed.append(fixed_text)
     fixed_body=map(unicode,fixed)
     fixed_body= " ".join(fixed_body)
-    """
-    print "-------------------------------------------"
-    print "Original Text"
-    print data[1]
-    print " "
-    print "Corrected Text"
-    print fixed_body
-    """
-    #print data[1]
-    #print "   "
-    #print fixed_body
+    corrected_text[msgid].append(fixed_body)
+    # Saved the corrected Text.
+
     if len(fixed_body) < 2:
         continue
     doc = nlp(fixed_body)
 
     for ent in doc.ents:
     	if  (ent.label_ =='ORG'):
-    		#print(ent.label_, ent.text)
             if ent.text.isalpha():
                 temp_org.append(ent.text)
+
     	if  (ent.label_ == 'PERSON'):
             if ent.text.isalpha():
     	       temp_person.append(ent.text)
 
     	if  (ent.label_ == 'GPE'):
             if ent.text.isalpha():
-    	       temp_place.append(ent.text)
+                temp_place.append(ent.text)
 
         if ent.text in org_coded_list:
             if ent.text.isalpha():
@@ -238,69 +258,53 @@ for data in c:
     for sentence in nltk.sent_tokenize(fixed_body) :
     	parsed = parser(sentence)
         for token in parsed :
-            if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
-                if token.text.isalpha():
+            if token.text.isalpha():
+                if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
                     all_nouns.append(token.text)
     	#print np.text
-    				
-    #output.write(msgid+'\n')
-    #output.write(subject+'\n')
-    #output.write(body+'\n')
-    #file_number +=1
-    count+=1
-
-
-
-    if count >100:
-    	break
-
-temp_place= list(set(temp_place) & set(all_nouns))
-temp_org= list(set(temp_org) & set(all_nouns))
+    
+print "Post analysis to Sharpen the data source"
+# The people are better understood by Spacy, so we leave this alone
 temp_person= list(set(temp_person) & set(all_nouns))
 
+# We have fixed people and kept other entities. These should include all other named entities.
+# We will check if these are actual Entities if found in Babel
+all_nouns =set(all_nouns)
+all_nouns.difference_update(temp_person)
+
+nouns_without_person = all_nouns
+all_valid_entities = []
+
+print len(list(nouns_without_person))
+for word in list(nouns_without_person):
+    if check_for_babelnet_entry(word) == 'found':
+        all_valid_entities.append(word)
+
+print len(all_valid_entities)
+
+temp_place= list(set(temp_place) & set(all_valid_entities))
+temp_org= list(set(temp_org) & set(all_valid_entities))
+
+# We need to use API to get detailed information on all_valid_entities, but we will save it as script for Now
 name_place_org = set(temp_person + temp_place + temp_org)
-all_nouns = set(all_nouns)
-all_nouns.difference_update(name_place_org)
+
+Interest_expertise = set(all_valid_entities)
+
+Interest_expertise.difference_update(name_place_org)
+
 
 print "Organizations"
-print temp_org
+print temp_org   # Needs to be Validated Using BabeL
 print "Places"
-print temp_place
+print temp_place # Needs to be Validated Using BabeL
 print "People"
 print temp_person
 print "Interest and Expertise"
-#print all_nouns
-"""
-#=================================================		
-
-words_to_count = (word for word in temp_place if word[:1].isupper())
-c = Counter(words_to_count)
-places= c.most_common(500)
-print places
-print "***********************************"
+print Interest_expertise  # Needs to be Validated Using BabeL
 
 
-words_to_count = (word for word in temp_org if word[:1].isupper())
-c = Counter(words_to_count)
-org= c.most_common(500)
-print org
-print "***********************************"
-
-words_to_count = (word for word in temp_person if word[:1].isupper())
-c = Counter(words_to_count)
-person= c.most_common(500)
-print person
-print "***********************************"
-
-
-#print c.most_common(500)
-
-#Now since we have all emails as text, its easier to load them and process using Spacy.
-
-# We will do a word cloud or dictionary first and save that as pickled object.
-
-#trying a new NLTK Entity recognizer.
-"""
+print len(list(Interest_expertise))
+print len(corrected_text.keys())
 
 
 print " "
