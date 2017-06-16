@@ -1,15 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<body>
+
 	<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
-    <h1 style="color:blue;">Welcome to EMAIL ANALYSIS App</h1>
-    <h2 style="color:green;">(Copy and paste your text below to perform sentiment Analysis)</h2>
-    <form action = "/" method="post">
-	<textarea name='textdata' type='text' id='my-text-box' class="textarea" >  </textarea>
-	<input class="myButton" type = "submit" value="Submit"></input>
-	</form>
-	<h3 style="color:blue;">How to intrepret the scores !</h3>
-	<h4>The App returns a score from -1.5 to +1.5 ranging from most negative to positive sentiment</h4>
+	<script src="{{url_for('static', filename='displacy.js')}}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<header class="o-banner">
+		<h1 class="u-heading-1">Welcome to the Sentiment analysis and Named Entity Recognizer App</h1>
+		<form action = "/" method="post">
+		<menu class="c-input c-input--full u-text-medium">
+				<div class="gr_ver_2" contenteditable="true" data-gramm="gramm" data-gramm_editor="true" data-reactroot="" style="position: absolute; color: transparent; overflow: hidden; white-space: pre-wrap; border-radius: 0px; box-sizing: border-box; height: 160px; width: 852.5px; margin: 8px 0px 0px 16px; padding: 16px 8px; z-index: 0; border-width: 0px; border-style: none; background: none 0% 0% / auto repeat scroll padding-box border-box rgba(0, 0, 0, 0); top: 0px; left: 0px;">
+					<span style="display: inline-block; line-height: 27.5px; color: transparent; overflow: hidden; text-align: left; float: initial; clear: none; box-sizing: border-box; vertical-align: baseline; white-space: pre-wrap; width: 100%; margin: 0px; padding: 0px; border: 0px; font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 20px; font-family: Sailec, Helvetica, Arial, sans-serif; letter-spacing: normal; text-shadow: none; height: 160px;">Hey how are you doing at Enron...</span><br>
+				</div>
+			<textarea name='textdata' type='text' id='my-text-box' class="c-input__field c-input__field--area" data-gramm="true" data-gramm_editor="true" placeholder="Your text here..." spellcheck="false" style="z-index: auto; position: relative; line-height: 27.5px; font-size: 20px; transition: none; background: transparent !important;"></textarea>
+
+		</menu>
+		<input class="myButton" type = "submit" value="Submit"></input>
+	</form>	
+	</header>
+
+<body onload="doStuffWithFiles({{ result }});">
+	 <div class =" conta" id="textContainer">    </div>
+	  <div class="entities" id="textContainer1">
+    When <mark data-entity="person">Sebastian Thrun</mark> started working on self-driving cars at
+    <mark data-entity="org">Google</mark> in <mark data-entity="date">2007</mark>, few people outside of the
+    company took him seriously.
+	</div>
+    <script>
+        function doStuffWithFiles(result){
+
+        	var lines = result[0];
+        	var spans = result[1];
+        	var text = result[2];
+        	
+        console.log(lines);
+    
+
+       // var data = ["I", " ", "a", "m", " ", "a", "m", "p", "l", "i", "f", "y"];
+           elements=[];
+
+        for (i =0; i < lines.length;i++ )
+        {
+           p = document.createElement("span");
+           p.innerText= lines[i][0];
+           var value = lines[i][1];
+           var opacity  = Math.abs(value/1.5);
+           var color = Math.floor(Math.abs(value*170));
+           //p.style.opacity=opacity;
+           if(value < 0)
+           {
+            p.style.backgroundColor="rgba("+color.toString()+",0,0,"+opacity+")";   
+           }
+           else{
+            p.style.backgroundColor="rgba(0,"+color.toString() +",0,"+opacity+")";   
+
+           }
+           elements.push(p)
+        }
+        setTimeout(function (){ placeElements(elements,elements[0])},100)
+
+        dostuffWithSpacy(spans,text);
+    }
+    function placeElements(elements,element)
+    {
+      
+        var container = document.createElement('div');
+        div.append(element);
+
+        if(elements.length > 0)
+          setTimeout(function() { placeElements(elements,elements.shift())},100)
+
+    }
+  function convertToHex(str){
+    var raw = str.match(/(\d+)/g);
+    var hexr = parseInt(raw[0]).toString(16);
+    var hexg = parseInt(raw[1]).toString(16);
+    var hexb = parseInt(raw[2]).toString(16);
+        hexr = hexr.length == 1 ? '0' + hexr: hexr;
+        hexg = hexg.length == 1 ? '0' + hexg: hexg;
+        hexb = hexb.length == 1 ? '0' + hexb: hexb;
+    var hex = '#' + hexr + hexg + hexb;
+    return hex;
+  }
+
+  function dostuffWithSpacy(temp){
+  		    console.log("Inside normal script");
+        	const displacy = new displaCyENT('http://localhost:8000', {
+    		container: '#displacy',
+    		defaultText: 'Welcome to Royal Bank of Canada, Toronto',
+    		defaultEnts: ['person', 'org', 'gpe', 'loc', 'product']
+			});
+        	const model = 'en'; 
+        	const text = "{{text}}";
+        	console.log(text)
+        	const spanns = temp;
+        	console.log(spanns);
+			const ents = ['person', 'org', 'gpe', 'loc', 'product'];
+			render(text, spanns, ents);
+  }
+
+  function render(text, spans, ents) {
+        div = $("#textContainer1")
+        div.innerHTML = '';
+        let offset = 0;
+        console.log(spans)
+        spans.forEach(({ type, start, end }) => {
+            const entity = text.slice(start, end);
+            const fragments = text.slice(offset, start).split('\n');
+
+            fragments.forEach((fragment, i) => {
+                div.appendChild(document.createTextNode(fragment));
+                if(fragments.length > 1 && i != fragments.length - 1) div.appendChild(document.createElement('br'));
+            });
+
+            if(ents.includes(type.toLowerCase())) {
+                const mark = document.createElement('mark');
+                mark.setAttribute('data-entity', type.toLowerCase());
+                mark.appendChild(document.createTextNode(entity));
+                div.appendChild(mark);
+            }
+
+            else {
+                div.appendChild(document.createTextNode(entity));
+            }
+
+            offset = end;
+        });
+
+        div.appendChild(document.createTextNode(text.slice(offset, text.length)));
+
+        console.log(`%c💥  HTML markup\n%c<div class="entities">${this.container.innerHTML}</div>`, 'font: bold 16px/2 arial, sans-serif', 'font: 13px/1.5 Consolas, "Andale Mono", Menlo, Monaco, Courier, monospace');
+
+    }
+ </script>
+
 </body>
+
+
 </html>
 

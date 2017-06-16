@@ -20,7 +20,7 @@ import urllib2
 from HTMLParser import HTMLParser
 
 
-
+import os
 import sys
 import urllib
 import urlparse
@@ -159,15 +159,42 @@ proper_nouns =[]
 all_nouns =[]
 corrected_text ={}
 all_words = []
+
+dir1 ='/Users/Dhanush/Desktop/EnronDataSetAnalysis/Enron_Database/Grammar_clean'
+
+# load the text into file
+temp_list = []
+counter = 0
+for file in os.listdir(dir1):
+    if file.endswith(".txt"):
+        file_to_read = dir1 + '/' + file 
+        f = open(file_to_read,'r')
+        data = str(f.readline())
+        temp= data.split('\n')[0]
+        corrected_text[temp] = {}
+        corrected_text[temp]['mail'] = f.read()
+        counter+=1
+        temp = str(file)
+        temp_list.append(int(temp.split('.')[0]))
+temp_list.sort()
+
+
+count = 0
+processed = 0
 for data in c:
-    if count < 112830:
+    """
+    if count  in temp_list:
         count +=1
         continue
+    """
 
-    if count > 140000:
-        break
-    print ("Processing Email:" + str(count) + " out of 175000")
-    count+=1
+    if count < 153508:
+        count+=1
+        continue
+
+    count +=1
+    processed +=1
+    print ('Currently processing the email number: ' + str(count))
     file_to_write = file_out + str(count) + '.txt'
     output = open(file_to_write, "w")
     msgid = str(data[0])
@@ -214,3 +241,6 @@ for data in c:
     #print ("=============")
     #print (str(fixed_body))
     output.close()
+
+
+print (" ")
