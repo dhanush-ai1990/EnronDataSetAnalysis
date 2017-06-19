@@ -1,0 +1,108 @@
+  <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Check the Sentiment of your input below</title>
+    <style>
+
+      text {
+        font-size: 1em;
+        stroke: black;
+        stroke-width: 2px;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  </head>
+  <body onload="doStuffWithFiles({{ result }})">
+  <!--input type="file" id="fileInput">
+  <input type="button" onclick="showTable" id="showButton"-->
+ <div id="textContainer">
+      
+    </div>
+    <script>
+
+        function doStuffWithFiles(lines){
+
+          console.log("Inside normal script")
+
+
+        console.log(lines);
+    
+
+       // var data = ["I", " ", "a", "m", " ", "a", "m", "p", "l", "i", "f", "y"];
+           elements=[];
+
+        for (i =0; i < lines.length;i++ )
+        {
+           p = document.createElement("span");
+           p.innerText= lines[i][0];
+           var value = lines[i][1];
+           var opacity  = Math.abs(value/1.5);
+           var color = Math.floor(Math.abs(value*170));
+           //p.style.opacity=opacity;
+           if(value < 0)
+           {
+            p.style.backgroundColor="rgba("+color.toString()+",0,0,"+opacity+")";   
+           }
+           else{
+            p.style.backgroundColor="rgba(0,"+color.toString() +",0,"+opacity+")";   
+
+           }
+           elements.push(p)
+        }
+        setTimeout(function (){ placeElements(elements,elements[0])},100)
+    }
+    function placeElements(elements,element)
+    {
+      
+        div = $("#textContainer")
+        div.append(element);
+
+        if(elements.length > 0)
+          setTimeout(function() { placeElements(elements,elements.shift())},100)
+
+    }
+  function convertToHex(str){
+    var raw = str.match(/(\d+)/g);
+    var hexr = parseInt(raw[0]).toString(16);
+    var hexg = parseInt(raw[1]).toString(16);
+    var hexb = parseInt(raw[2]).toString(16);
+        hexr = hexr.length == 1 ? '0' + hexr: hexr;
+        hexg = hexg.length == 1 ? '0' + hexg: hexg;
+        hexb = hexb.length == 1 ? '0' + hexb: hexb;
+    var hex = '#' + hexr + hexg + hexb;
+    return hex;
+  }
+         //document.getElementById('fileInput').addEventListener('change', showTable, false);
+      // var posScale = d3.scale.ordinal()
+      //   .domain(d3.range(data.length))
+      //   .rangeRoundPoints([20, 150]);
+      // //var colorScale = d3.scale.category20c()
+      // //  .domain(d3.range(data.length));
+
+
+      // var svg = d3.select("body").append("svg");
+
+      // svg.attr("width", 1000)
+      //   .attr("height", 200)
+      //   .style("opacity", .2)
+      //   .style("fill", "red");
+
+      // var texts = svg.selectAll("text").data(data)
+
+      // texts.enter()
+      //   .append("text")
+      //   .text(function (d) { return d; });
+
+      // texts.attr("text-anchor", "middle")
+      //   .attr("y", 100)
+      //   .attr("x", function (d, i) { return posScale(i); } )
+      //   .attr("fill", function (d, i) { return colorScale(i); });
+
+    </script>
+   
+
+
+  </body>
+</html>
