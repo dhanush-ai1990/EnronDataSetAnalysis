@@ -142,7 +142,7 @@ class Model(object):
             embd_wn=True,
         )
         global params
-        params = [np.load('model/%d.npy'%i) for i in range(15)]
+        params = [np.load('/Users/Dhanush/Desktop/Enron_Data/model/%d.npy'%i) for i in range(15)]
         params[2] = np.concatenate(params[2:6], axis=1)
         params[3:6] = []
 

@@ -29,5 +29,8 @@ def get_activations(text):
 
 	return list1
 
+text = "This is one of the Crichton's best books. The characters are beautifully developed and their interactions are are exciting and complex throughout this impressive novel. But this may be the absolute worst disparity in quality between novel and screen adaptation ever. The movie was just dreadful."
+print (get_activations(text))
+
 
 

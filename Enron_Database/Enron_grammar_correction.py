@@ -168,41 +168,16 @@ all_words = []
 
 
 dir1 ='/Users/Dhanush/Desktop/EnronDataSetAnalysis/Enron_Database/Grammar_clean'
-# load the text into file
-
-temp_list = []
-counter = 0
-for file in os.listdir(dir1):
-    if file.endswith(".txt"):
-        file_to_read = dir1 + '/' + file 
-        f = open(file_to_read,'r')
-        data = str(f.readline())
-        temp= data.split('\n')[0]
-        corrected_text[temp] = {}
-        corrected_text[temp]['mail'] = f.read()
-        counter+=1
-        temp = str(file)
-        temp_list.append(int(temp.split('.')[0]))
-temp_list.sort()
 
 
-count = 0
-processed = 0
-left =[]
-for i in range(177000):
-    if i not in temp_list:
-        print (i)
-
-        left.append(i)
-
-print (len(left))
 for data in c:
-    if count not in left:
+
+    if count < 130089:
         count+=1
         continue
 
+
     count +=1
-    processed +=1
     print ('Currently processing the email number: ' + str(count))
     file_to_write = file_out + str(count) + '.txt'
     output = open(file_to_write, "w")

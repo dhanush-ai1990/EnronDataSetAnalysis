@@ -6,6 +6,7 @@ import re
 #from sklearn.externals import joblib
 #import cs
 #import cStringIO
+from sklearn.externals import joblib
 import sqlite3
 import json
 import sys
@@ -94,6 +95,7 @@ temp_list.sort()
 
 keys = corrected_text.keys()
 
+
 # Check based on file name
 
 email_entity_dict = {}
@@ -112,55 +114,57 @@ count = 0
 
 for key in keys:
 
-    count+=1
+
     print "Processing Email: " +str(count)
     fixed_body=map(unicode,corrected_text[key]['mail'])
     fixed_body = "".join(fixed_body)
 
     if len(fixed_body) < 5:
+        count+=1
+        print ("Error")
         continue
 
     doc = nlp(fixed_body)
-    current_noun = []
-    for sentence in nltk.sent_tokenize(fixed_body) :
-        parsed = parser(sentence)
-        for token in parsed :
-            if token.text.isalpha():
-                if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
-                    all_nouns.append(token.text)
-                    current_noun.append(token.text)
-                    email_entity_dict[int(key)]['tokens'].append(token.text)
-
     for ent in doc.ents:
 
-        if ent.text not in current_noun:
-            continue
-
-    	if  (ent.label_ =='ORG'):
+        print ("here")
+    
+        if  (ent.label_ =='ORG'):
             if ent.text.isalpha():
                 temp_org.append(ent.text)
                 email_entity_dict[int(key)]['Org'].append(ent.text)
 
-    	if  (ent.label_ == 'PERSON'):
+        if  (ent.label_ == 'PERSON'):
             if ent.text.isalpha():
-    	       temp_person.append(ent.text)
+               temp_person.append(ent.text)
                email_entity_dict[int(key)]['Names'].append(ent.text)
 
-    	if  (ent.label_ == 'GPE'):
+        if  (ent.label_ == 'GPE'):
             if ent.text.isalpha():
                 temp_place.append(ent.text)
                 email_entity_dict[int(key)]['Places'].append(ent.text)
 
 
 
-    if count >5000:
-        break
+    for sentence in nltk.sent_tokenize(fixed_body) :
+        parsed = parser(sentence)
+        for token in parsed :
+            if token.text.isalpha():
+                if (token.tag_ == "NNP") or (token.tag_ == "NNPS"):
+                    all_nouns.append(token.text)
+                    email_entity_dict[int(key)]['tokens'].append(token.text)
+                    print ("ner")
+    count+=1
+    #print all_nouns
+   
+
+
 
 B = time.time()
 
 # Create word clouds for body.
 
-
+"""
 print("Names")
 People = [x.lower() for x in temp_person]
 People = ' '.join(People)
@@ -182,11 +186,24 @@ all1 = [x.lower() for x in all_nouns]
 all1 = ' '.join(all1)
 generate_wordcloud(all1,"All")
 
-
+"""
 print ("Time taken for processing " + str (B-A) + " secs.")
+print (len(all_nouns))
+print (len(temp_place))
+print (len(temp_org))
+print (len(temp_person))
+
+#Dump the pickle objects
+
+dump ='/Users/Dhanush/Desktop/EnronDataSetAnalysis/Enron_Database/pickle/'
+
+print ("Initializing the Data dumps")
+joblib.dump(email_entity_dict, dump+'Entity.pkl')
+joblib.dump(all_nouns, dump+'All_Entity.pkl')
+joblib.dump(temp_person, dump+'People.pkl')
+joblib.dump(temp_org, dump+'Org.pkl')
+joblib.dump(temp_place, dump+'Place.pkl')
 
 
 
-
-
-                    
+print ("")
