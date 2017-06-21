@@ -172,10 +172,9 @@ dir1 ='/Users/Dhanush/Desktop/EnronDataSetAnalysis/Enron_Database/Grammar_clean'
 
 for data in c:
 
-    if count < 130089:
+    if count < 139400:        
         count+=1
         continue
-
 
     count +=1
     print ('Currently processing the email number: ' + str(count))

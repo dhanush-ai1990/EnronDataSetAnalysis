@@ -24,13 +24,13 @@ def call_spacy(text):
 
 @app.route("/")
 def hello():
-	text = 'Welcome to Royal Bank of Canada, Toronto'
-	json = call_spacy(text)
-	return render_template("untitled.html",text = text,json=json)
+	return render_template("untitled.html")
 
 @app.route('/', methods=['GET', 'POST'])
 
 def doSentimentAnalysis():
+	print ("fjhdjdjjdjdj")
+
 	if request.method == "POST":
 		text = request.form.get('textdata')
 
