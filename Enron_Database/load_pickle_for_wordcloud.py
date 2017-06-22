@@ -7,8 +7,25 @@ import urllib2
 from HTMLParser import HTMLParser
 
 
+API_Key ='AIzaSyAXSTt536rRbl4dK4pzuPs-QfuGKTT-YBk'
+
+def google_KG_search(word):
+
+	service_url = 'https://kgsearch.googleapis.com/v1/entities:search'
+	params = {
+	'query': word,
+	'limit': 3,
+	'indent': True,
+	'key': api_key,
+	}
+
+	url = service_url + '?' + urllib.urlencode(params)
+	response = json.loads(urllib.urlopen(url).read())
+	for element in response['itemListElement']:
+
+
 place_stop_list =[]
-place_file = open ('/Users/Dhanush/Desktop/Enron_Data/list_Places.txt','r')
+place_file = open ('/Users/Dhanush/Desktop/Enron_Data/places_noise.txt','r')
 for line in place_file:
     line = line.replace('\n','')
     place_stop_list.append(line)
@@ -34,62 +51,49 @@ def check_for_babelnet_entry(word):
     login_response = session.get(URL)
     soup = BeautifulSoup(login_response.text, "html.parser")
     Output=json.loads(str(soup))
+    print (Output)
     if len(Output) <1:
         return False
     else:
         return True
 
-data= joblib.load('/Users/Dhanush/Desktop/Enron_Data/pickle/place.pkl')
+data= joblib.load('/Users/Dhanush/Desktop/Enron_Data/pickle/All_Entity.pkl')
 data =[element.lower() for element in data]
 print (len(data))
 
 counter = Counter(data)
 
-counter_selected_all = counter.most_common(2000)
-counter_selected = 	counter.most_common(880)
+counter_selected = 	counter.most_common(7500)
 
 
 list_selected = []
-for i in counter_selected_all:
-
-	if i[1] < 25:
-		print (count)
-		break
+count = 0
+for i in counter_selected:
+	
 
 	word = i[0]
+
+
 	word = word.strip()
 	word = word.strip()
+
 	if len(word) < 3:
 		continue
-
 	if check_for_babelnet_entry(word):
-		if check_noise(word):
-			list_selected.append(word)
+		print i
+		count +=1
+		list_selected.append(word)
 
 
-
-
-
-list_all = []
-for i in counter_slected_all:
-	word = i[0]
-	word = word.strip()
-	word = word.strip()
-	if len(word) < 3:
-		continue
-
-	if check_for_babelnet_entry(word):
-		if check_noise(word):
-			list_all.append(word)
-
-print (len(list_all))
 print (len(list_selected))
 
 
 
-
 """
+
 dump ='/Users/Dhanush/Desktop/Enron_Data/pickle/'
 joblib.dump(list_selected, dump+'Place_selected.pkl')
-joblib.dump(list_all, dump+'Place_all_final.pkl')
-"""
+joblib.dump(list_selected, dump+'Place_all_final.pkl')
+
+""" 
+        
