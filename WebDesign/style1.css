@@ -1,0 +1,132 @@
+
+
+body {
+	font-family: 'Lato', sans-serif;
+	color: #666;
+	font-size: 16px;
+	/*line-height: 24px;*/
+	line-height: 1.6;
+	/*margin-bottom: 64px;*/
+}
+
+p {
+	margin-top: 0;
+}
+
+h1,h2,h3,h4,h5 {
+	font-family: 'Oswald', sans-serif;
+	color: #0094b8;
+	font-weight: 300;
+	line-height: normal;
+	text-transform: uppercase;
+	margin-bottom: .5em;
+}
+
+h1 {
+/*	font-size: 80px;
+	line-height: 80px;
+	letter-spacing: 1px;*/
+}
+
+h1 {
+	font-family: 'Lato', sans-serif;
+	text-transform: none;
+	letter-spacing: 0;
+	margin-bottom: .5em;
+	margin-top: 1em;
+}
+
+h2 {
+	font-size: 32px;
+}
+
+h3 {
+	font-size: 24px;
+}
+
+h4 {
+	font-size: 18px;
+	letter-spacing: 1px;
+	color: #333;
+}
+
+h5 {
+	font-size: 18px;
+	letter-spacing: 1px;
+	color: #333;
+	margin: 0;
+	font-weight: 400;
+}
+
+/*--------------------------------------------*/
+/* VC Hacks & Classes
+/*--------------------------------------------*/
+
+
+.container {
+	position: relative;
+}
+
+/*Fix*/
+.js_active .single-event .content-area{
+	padding: 0;
+	width: 100%;
+}
+
+/*Fix*/
+.js_active .entry-header.natural{
+	display: none;
+}
+
+
+.vc_row {
+	width: 100%;
+	margin-left: auto !important;
+	margin-right: auto !important;
+	position: relative;
+}
+
+.vc_row .vc_row {
+	max-width: 1170px;
+}
+
+.vc_row .vc_row.narrow {
+	max-width: 800px;
+}
+
+.vc_col-sm-12 {
+	position: static !important;
+}
+
+.nopad .vc_col-sm-12 {
+	padding: 0;
+}
+
+.constrain {
+	max-width: 1170px;
+}
+
+
+/* Parallax */
+
+.parallax-bg {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: 50% 0;
+	background-size: cover;
+}
+
+.parallax-bg.repeat {
+	background-size: auto;
+	background-repeat: repeat;
+}
+
+html.touch .parallax-bg {
+	background-attachment: scroll;
+}

@@ -41,33 +41,35 @@ def google_KG_search(word,type_data):
 	response = json.loads(urllib.urlopen(url).read())
 	flag = 0
 	u = 'University'
+
+
 	try:
-for element in response['itemListElement']:
+		for element in response['itemListElement']:
 
 
-	description1 = element['result']['@type'] #list
-	for e in description1:
-		if e in type_data:
-			try:
-				name = element['result']['name']
-				temp = name.split(" ")
-				if temp[0] == 'University':
-					name = word.title()
+			description1 = element['result']['@type'] #list
+			for e in description1:
+				if e in type_data:
+					try:
+						name = element['result']['name']
+						temp = name.split(" ")
+						if temp[0] == 'University':
+							name = word.title()
 
 
-			except KeyError:
-				return []
-			try:
-				description = element['result']['description']
-			except KeyError:
-				return []
-			try:
-				detailed_description = element['result']['detailedDescription']['articleBody']
-			except KeyError:
-				return []
-			flag = 1
-	if flag ==1:
-		break
+					except KeyError:
+						return []
+					try:
+						description = element['result']['description']
+					except KeyError:
+						return []
+					try:
+						detailed_description = element['result']['detailedDescription']['articleBody']
+					except KeyError:
+						return []
+					flag = 1
+			if flag ==1:
+				break
 
 	except KeyError:
 		return []
