@@ -63,6 +63,8 @@ h5 {
 /*--------------------------------------------*/
 
 
+
+
 .container {
 	position: relative;
 }
@@ -110,7 +112,7 @@ h5 {
 /* Parallax */
 
 .parallax-bg {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	right: 0;
 	bottom: 0;
@@ -129,4 +131,11 @@ h5 {
 
 html.touch .parallax-bg {
 	background-attachment: scroll;
+    
+}
+
+
+.sections {
+    padding-top: 10vh !important;
+    padding-bottom: 0vh !important;
 }

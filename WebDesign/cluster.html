@@ -1,0 +1,293 @@
+<html>
+<head>
+    
+            <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+        <!--        <link rel="stylesheet" href="assets/css/bootstrap-theme.min.css">-->
+
+
+        <!--For Plugins external css-->
+        <link rel="stylesheet" href="assets/css/plugins.css" />
+        <link rel="stylesheet" href="assets/css/lato-webfont.css" />
+        <link rel="stylesheet" href="assets/css/magnific-popup.css">
+ 
+        
+<link rel='stylesheet' id='ls-google-fonts-css'  href='http://fonts.googleapis.com/css?family=Lato:100,300,regular,700,900%7COpen+Sans:300%7CIndie+Flower:regular%7COswald:300,regular,700&#038;subset=latin%2Clatin-ext' type='text/css' media='all' />
+    
+    <nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#"><img src="assets/images/logo.png" alt="" /></a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#About">About</a></li>
+                        <li><a href="index.html#Demo">Demo</a></li>
+                        <li><a href="index.html#testimonial">Datasets</a></li>
+                        <li><a href="index.html#technology">Technology</a></li>
+                        <li><a href="index.html#team">Team</a></li>
+
+                    </ul>
+                    
+                    
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+    
+    <style>
+            /*For Menu Style*/
+
+.navbar-default {
+    background-color: rgba(48, 48, 48, 0.42);
+    border-color:0;
+}
+
+.navbar {
+    min-height:90px;
+    margin-bottom:0;
+    border:0;
+    border-radius:0;
+}
+
+.navbar-default .navbar-nav>li>a {
+    font-size:14px;
+    text-transform:uppercase;
+    color:#fff;
+	line-height: 55px;
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+    color:#4bcaff;
+}
+
+.navbar-default .navbar-nav>.active>a, .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus {
+    color: #fff;
+    background-color: transparent;
+    border-top: 3px solid #4bcaff;
+}
+    </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/alchemyjs/0.4.2/alchemy.min.css" />
+    
+    
+</head>
+
+<body>
+     <div class="test" style="background-color:black;padding-Top:100px!important;padding-bottom:10px;text-align:center;"></div> 
+    
+  <div class="alchemy" id="alchemy"></div>
+          
+  <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alchemyjs/0.4.2/alchemy.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alchemyjs/0.4.2/scripts/vendor.js"></script>
+  <script type="text/javascript">
+      var json =  {
+    "comment": "Network Graph",
+    "nodes": [
+        {
+            "id": "s1",
+            "caption": "Oil",
+            "role": "topic",
+            "memoryUsage": 50,
+            "root": true
+        },
+        {
+            "id": "s2",
+            "caption": "Sahba Ezami",
+            "role": "person",
+            "memoryUsage": 22,
+            "root": false
+        },        
+        {
+            "id": "s3",
+            "caption": "Aditi Miglani",
+            "role": "person",
+            "memoryUsage": 95,
+            "root": false
+        },
+        {
+            "id": "s4",
+            "caption": "Tax",
+            "role": "topic",
+            "memoryUsage": 10,
+            "root": true
+        },
+        {
+            "id": "s5",
+            "caption": "Ada Ene",
+            "role": "person",
+            "memoryUsage": 30,
+            "root": false
+        },
+        {
+            "id": "s6",
+            "caption": "Dhanush Dharmaretnam",
+            "role": "person",
+            "memoryUsage": 10, 
+            "root": false
+        },
+        {
+            "id": "s7",
+            "caption": "Eric Rumfels",
+            "role": "person",
+            "memoryUsage": 42,
+            "root": false
+        },
+        {
+            "id": "s8",
+            "caption": "Greg Olmstad",
+            "role": "person",
+            "memoryUsage": 42,
+            "root": false
+        },
+        {
+            "id": "s9",
+            "caption": "Finance",
+            "role": "topic",
+            "memoryUsage": 42,
+            "root": true
+        },
+        {
+            "id": "s10",
+            "caption": "Oren Kumer",
+            "role": "topic",
+            "memoryUsage": 42,
+            "root": false
+        },
+        {
+            "id": "s11",
+            "caption": "Jose Domingo",
+            "role": "topic",
+            "memoryUsage": 42,
+            "root": false
+        }
+
+    ],
+    "edges": [
+        {
+            "source": "s1",
+            "target": "s2",
+            "load": 2
+        },
+        {
+            "source": "s1",
+            "target": "s3",
+            "load": 2
+        },
+        {
+            "source": "s1",
+            "target": "s5",
+            "load": 2
+        },
+        {
+            "source": "s1",
+            "target": "s6",
+            "load": 4
+        },
+        {
+            "source": "s4",
+            "target": "s7",
+            "load": 1
+        },
+        {
+            "source": "s8",
+            "target": "s4",
+            "load": 1
+        },
+        {
+            "source": "s8",
+            "target": "s9",
+            "load": 5
+        },
+        {
+            "source": "s9",
+            "target": "s10",
+            "load": 1
+        },
+        {
+            "source": "s9",
+            "target": "s11",
+            "load": 2
+        }
+    ]
+};
+      var config = {
+            dataSource: json,
+            nodeTypes: { "role": 
+                ["topic", "person"] 
+            }, 
+            nodeCaptionsOnByDefault: true,
+            forceLocked: false,
+            nodeStyle: {
+                
+                "all": {
+                    "borderColor": "#000000",
+                    "borderWidth": function(d, radius) {
+                        return 5
+                    },
+                    "color": function(d) { 
+
+                        if(d.getProperties().root)
+                        return "#DAA520"; else return "#CD5C5C"
+                    }, 
+                    "radius": function(d) {
+                        if(d.getProperties().root)
+                        return 30; else return 12 
+                    }, 
+                    "text": function(d) {
+                        display: block;
+                    }, 
+                }
+            },
+            edgeStyle: {
+                "all": {
+                    "width": function(d) {
+                     return (d.getProperties().load + 0.5) * 1.3 
+                    }
+                }
+            }
+        };
+
+    alchemy = new Alchemy(config)
+
+  </script>
+      
+    
+        <script src="assets/js/vendor/jquery-1.11.2.min.js"></script>
+        <script src="assets/js/vendor/bootstrap.min.js"></script>
+
+
+        <script src="http://maps.google.com/maps/api/js"></script>
+        <script src="assets/js/gmaps.min.js"></script>
+
+        <script src="assets/js/jquery.magnific-popup.js"></script>
+
+        <script src="assets/js/plugins.js"></script>
+        <script src="assets/js/main.js"></script>
+        
+
+</body>
+    
+
+            <footer id="footer" class="footer" style ="padding-top: 10px !important;padding-bottom:20px!important;position: relative;overflow: hidden;padding: 10px 25px; background-color: #98c448;background-color:lightblue;width: 100%;z-index: 200;font-weight: 400;font-size: 14px;
+	line-height: normal;">
+
+                            <div class = "footer-location">
+                         <h4 style ="text-transform: none;font-size: 16px;text-align: center;padding:0px;letter-spacing: 1px;">&copy; Copyright 2017 Royal bank of Canada | RBC Capital Markets | Developed for RBC Amplify Program 2017  </h4>
+                        </div>
+
+        </footer>
+
+</html>
+
+
+      
