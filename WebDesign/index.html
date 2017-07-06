@@ -33,6 +33,32 @@
         <link rel="stylesheet" href="assets/css/responsive.css" />
 
         <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+        
+        <script>
+        function wheel(event) {
+      var delta = 0;
+      if (event.wheelDelta) {(delta = event.wheelDelta / 120);}
+      else if (event.detail) {(delta = -event.detail / 3);}
+
+      handle(delta);
+      if (event.preventDefault) {(event.preventDefault());}
+      event.returnValue = false;
+  }
+
+  function handle(delta) {
+      var time = 4000;
+      var distance = 1700;
+
+      $('html, body').stop().animate({
+          scrollTop: $(window).scrollTop() - (distance * delta)
+      }, time );
+  }
+
+  if (window.addEventListener) {window.addEventListener('DOMMouseScroll', wheel, false);}
+    window.onmousewheel = document.onmousewheel = wheel;
+        
+        
+        </script>
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -71,25 +97,36 @@
 
         <!--Home page style-->
         <header id="home" class="home">
+            <div class="vc_row wpb_row vc_row-fluid dark vc_custom_1413400385235 vc_row-has-fill">
+								<div class="wpb_column vc_column_container vc_col-sm-12">
+									<div class="vc_column-inner">
+                                        
+                                        <div class="parallax-bg repeat" data-bottom-top="background-position: 50% -400px" data-top-bottom="background-position: 50% 0" style="background-image:url('assets/images/letters.png');
+    height: 800px;">
+                                       <a> <img style="    width: 500px;
+    margin: auto;
+ 
+    margin-top: 350px;
+" src="assets/images/glasses.png" class="img-responsive"/></a>
+                                        </div>
+        
+                                     
+                                       
+                                           
 
-            <div class="container">
+   
+                <div class="vc_empty_space" style="height: 30px">
+												<span class="vc_empty_space_inner"></span>
+											</div>
 
-                <div class="row">
+                                </div>
 
-                    <div class="col-md-6 col-md-offset-6 col-sm-12 col-xs-12">
-                        <div class="home-content sections">
 
-                            <h1 style="color:#B7950B;font-weight: 600;"><span>Understanding Relationships in  Global Markets</span></h1>
-                            <htexter> We are here to help you to understand the interest, expertise and relationships in Capital markets at RBC. Our new technology incorporates the state of the art tools in Neural Networks and Natural Language Processing to enable you to leverage the wealth of data in Capital markets.
-                            
-                            </htexter>
+                            </div>
 
-                        </div>
-                    </div>
-                </div>
 
-            </div>
-
+                 
+</div>
         </header>
 
         <section id="About">
