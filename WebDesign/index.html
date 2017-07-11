@@ -34,31 +34,6 @@
 
         <script src="assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
         
-        <script>
-        function wheel(event) {
-      var delta = 0;
-      if (event.wheelDelta) {(delta = event.wheelDelta / 120);}
-      else if (event.detail) {(delta = -event.detail / 3);}
-
-      handle(delta);
-      if (event.preventDefault) {(event.preventDefault());}
-      event.returnValue = false;
-  }
-
-  function handle(delta) {
-      var time = 4000;
-      var distance = 1700;
-
-      $('html, body').stop().animate({
-          scrollTop: $(window).scrollTop() - (distance * delta)
-      }, time );
-  }
-
-  if (window.addEventListener) {window.addEventListener('DOMMouseScroll', wheel, false);}
-    window.onmousewheel = document.onmousewheel = wheel;
-        
-        
-        </script>
     </head>
     <body>
         <!--[if lt IE 8]>
@@ -96,40 +71,30 @@
         </nav>
 
         <!--Home page style-->
+          <!--Home page style-->
         <header id="home" class="home">
-            <div class="vc_row wpb_row vc_row-fluid dark vc_custom_1413400385235 vc_row-has-fill">
-								<div class="wpb_column vc_column_container vc_col-sm-12">
-									<div class="vc_column-inner">
-                                        
-                                        <div class="parallax-bg repeat" data-bottom-top="background-position: 50% -400px" data-top-bottom="background-position: 50% 0" style="background-image:url('assets/images/letters.png');
-    height: 800px;">
-                                       <a> <img style="    width: 500px;
-    margin: auto;
- 
-    margin-top: 350px;
-" src="assets/images/glasses.png" class="img-responsive"/></a>
-                                        </div>
-        
-                                     
-                                       
-                                           
 
-   
-                <div class="vc_empty_space" style="height: 30px">
-												<span class="vc_empty_space_inner"></span>
-											</div>
+            <div class="container">
 
-                                </div>
+                <div class="row">
 
+                    <div class="col-md-6 col-md-offset-6 col-sm-12 col-xs-12">
+                        <div class="home-content sections">
 
-                            </div>
+                            <h1>Understanding Relationships in <span> Global Markets</span></h1>
+                            <htexter> We are here to help you to understand the interest, expertise and relationships in Capital markets at RBC. Our new technology incorporates the state of the art tools in Neural Networks and Natural Language Processing to enable you to leverage the wealth of data in Capital markets.
+                            
+                            </htexter>
 
+                        </div>
+                    </div>
+                </div>
 
-                 
-</div>
+            </div>
+
         </header>
 
-        <section id="About">
+       <section id="About">
                  <link rel='stylesheet' id='js_composer_front-css'  href='//www.hyperxmedia.com/wp-content/uploads/js_composer/js_composer_front_custom.css?ver=5.0.1' type='text/css' media='all' />
             <link rel="stylesheet" href="assets/css/special.css">
             <div id="map"></div>  
@@ -173,29 +138,22 @@
 														<div class="wpb_wrapper">
 															<div class="wpb_text_column wpb_content_element">
 																<div class="wpb_wrapper">   
-                                                                    <h4 style="text-align: center;">PROBLEM STATEMENT<strong><br></strong></h4>
+                                                                    <h4 style="text-align: center;">USE CASES<strong><br></strong></h4>
 
-																	<p><strong>THIRD PARTY CRM TOOLS</strong><br>
-																	Increase lead-to-opportunity and opportunity-to-sale conversion rates.</p>
-
+																	<p><strong>PROBLEM</strong><br>
+																	CASE 1: We want to better understand client interest in order to offer them products and services to increase client retention and revenue.
+                                                                    </p>
+                                                                    <p>
+                                                                    CASE 2: All employees in RBC have interests and expertise in certain fields. There is a lot of content and data flowing in and around RBC and it is not leveraged in a way that can benefit the employees. 
+                                                                    </p>
 
 																	<p><strong>OUR SOLUTION:</strong><br>
-																	Content marketing automation strategy. Paid lead vendor optimization. Full Marketo makeover. Compelling content development. Vigilant marketing automation enhancements. Call center lead qualification.</p>
+																	CASE 1: Create a social network of clients for searching client’s interests  Potential Client Discovery Product Recommendation </p>
+                                                                    <p>
+                                                                    CASE 2: An internal search system that connects knowledge seekers to knowledge providers.
+                                                                    </p>
 
-
-																	<p><strong>PRODUCTS</strong>
-																	</p>
-
-
-																	<ul>
-																		<li>54% Increase in Total Sales</li>
-
-
-																		<li>64% Increase&nbsp;in Opp-to-Sale Conversions</li>
-
-
-																		<li>45% Increase in Total Sales Opportunities</li>
-																	</ul>
+																
 																</div>
 															</div>
 														</div>
@@ -208,40 +166,28 @@
 														<div class="wpb_wrapper">
 															<div class="wpb_text_column wpb_content_element">
 																<div class="wpb_wrapper">
-																	<h4 style="text-align: center;">PROBLEM STATEMENT<strong><br></strong></h4>
+																	<h4 style="text-align: center;">POSSIBLE APPLICATIONS<strong><br></strong></h4>
 
-
-																	<p><strong>THIRD PARTY CRM TOOLS</strong><br>
-																	Increase highly qualified lead volume and decrease overall cost per lead.</p>
+                                                                    <p><strong>SEARCH ENGINE</strong><br>
+                                                                    To connect knowledge seekers to knowledge providers in Capital Market.
+                                                                    </p>
                                                                     
-                                                                    	<ul>
-																		<li>575% Increase in Lead Volume</li>
+                                                                    <p><strong>PERSONALIZED NEWSLETTER</strong><br>
+                                                                    To provide customized content to clients and employees based on their interests.
+                                                                    </p>
 
+                                                                    <p><strong>TOPIC CLUSTER</strong><br>
+                                                                    To link clusters of people with similar interest and expertise.
+                                                                    </p>
 
-																		<li>27% Conversion Rate Improvement</li>
+                                                                    <p><strong>CLIENT DASHBOARDS</strong><br>
+                                                                    To display an abstract view of internal and external relationships in RBC and statistics based on our AI models.
+                                                                    </p>
 
+                                                                    <p><strong>HR ALERTS</strong><br>
+                                                                    Monitor potential risk activity to help in the retention of clients
+                                                                    </p>
 
-																		<li>647%&nbsp;Reduction in Average Cost Per Lead</li>
-																	</ul>
-
-
-																	<p><strong>PROBLEM:</strong><br>
-																	Optimization of corporate website&nbsp;and landing pages for conversion, SEO and mobile. New banner set designs. Multi-channel digital advertising strategy, implementation and optimization. Integrated traditional media campaigns.</p>
-
-
-																	<p><strong>TWO-YEAR RESULTS:</strong>
-																	</p>
-
-
-																	<ul>
-																		<li>575% Increase in Lead Volume</li>
-
-
-																		<li>27% Conversion Rate Improvement</li>
-
-
-																		<li>647%&nbsp;Reduction in Average Cost Per Lead</li>
-																	</ul>
 																</div>
 															</div>
 														</div>
@@ -254,22 +200,24 @@
 														<div class="wpb_wrapper">
 															<div class="wpb_text_column wpb_content_element">
 																<div class="wpb_wrapper">
-																	<h4 style="text-align: center;">CLIENT SIDE</h4>
+																	<h4 style="text-align: center;">OUR AI</h4>
+                                                                    <strong>WHAT IS IT ?</strong>
+                                                                    <p>
+                                                                    Machine learning models for sentiment analysis, formality analysis, topic modelling, and expertise classification that make up our AI
+                                                                    </p>
 
+																	<p><strong>RELATIONSHIPS:</strong><br>
+																	Our sentiment Model processes positive/Negative sentiment from email conversations. Our formality Model processes Formal/Informal sentiment. Number of exchanges between sender and receiver as well as the time known contibute to relationship score.
+                                                                    </p>
 
-																	<p><strong>PROBLEM:</strong><br>
-																	Increase sales qualified leads and existing client sales activity.</p>
+																	<p><strong>INTEREST AND EXPERTISE:</strong><br>
+																	Topic Modelling with LDA to extract interests and expertise and map them to people. Our intersest/expertise classifier distinguised between those interested in an entity and those who are experts in a domain.
+                                                                    </p>
 
-
-																	<p><strong>OUR SOLUTION:</strong><br>
-																	Comprehensive content marketing automation strategy and tactical plan. Marketing automation platform and CRM implementation. Revamped corporate website. eGuides, blog posts, infographics, webinars and email streams.</p>
-
-
-																	<p><strong>PRODUCTS:</strong>
+																	<p><strong>DICTIONARY:</strong><br>
+                                                                    Named entity recognition using Spacy, Google KG API
 																	</p>
 
-
-																	<p>Transformed an old school promotional-based marketing approach into a modern automated-content-marketing machine.</p>
 																</div>
 															</div>
 														</div>
@@ -284,7 +232,7 @@
 										</div>
 									</div>
 								</div>
-							</div>
+           </div>
  </section>
         <!-- Sections -->
         <section id="Demo" class="sections">
