@@ -1,0 +1,35 @@
+Amazon Elastic Search
+=====================
+
+
+Stored data using inverted index. Faster search mechanism.
+
+Looks for the index of the document like a page number in the book.
+
+Open Source ! 
+
+JSON Input and output
+
+
+Spin up a single machine - Its a single load.
+
+Distributed frame work.
+
+
+Elastic Stack - >
+Kibana -> visualization layers.
+Beats -> CSC, log files, stream , Light weight  shipper whiich packages and collects data.
+	eg metric beat -> Looks for performance of the system. Sounds like a tool to monitor something.
+	helps to ship data to elastic. 
+
+LogStash -> More powerful beat. Helps to add more functionalities. Helps convert raw data and create more meaningful info and store into JSON.
+
+
+X Pack - Machine learning.
+Elastic Cloud - AWS
+
+
+Logstash with JDBC for moving from database and put into elastic database. Data needs to be indexed into elastic.
+
+
+DSL

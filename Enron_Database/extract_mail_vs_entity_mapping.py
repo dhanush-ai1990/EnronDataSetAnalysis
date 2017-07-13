@@ -199,7 +199,9 @@ keys = corrected_text.keys()
 email_entity_dict = {}
 tag_temp = {}
 
+email_vs_entity_alone = {}
 for key in keys:
+    email_vs_entity_alone[key] = []
     email_entity_dict[key] = {}
     email_entity_dict[key]['Names'] = []
     email_entity_dict[key]['Places'] = []
@@ -217,13 +219,25 @@ c = Database.cursor()
 SQL = "select msgid, sender_email, receiver_email, sender_first_name,sender_last_name,sender_full_name, receiver_first_name, receiver_last_name,receiver_full_name from `Enron Prime`"
 c.execute(SQL)
 
+hold = None
+flag = False
 
-
+"Processing database"
 for record in c:
     MSGID = int(record[0])
+
     if MSGID not in keys:
         print ("skipping record")
         continue
+
+    if hold == MSGID:
+        flag = False
+
+    else:
+        flag = True
+        hold = MSGID
+
+
     email_entity_dict[MSGID]['sender_email'] = record[1]
 
     if record[3] == '**' or record[4] == "**":
@@ -231,13 +245,19 @@ for record in c:
     else:
         email_entity_dict[MSGID]['sender_Name'] = record[5]
 
+        if flag == True:
+            email_vs_entity_alone[MSGID].append(record[5])
     if record[6] == '**' or record[7] == "**":
     		placeholder =0
     else:
     	email_entity_dict[MSGID]['receiver_name'].append(record[8])
+        email_vs_entity_alone[MSGID].append(record[8])
 
     email_entity_dict[MSGID]['receiver_email'].append(record[2])
 
+
+   
+print "Processing the entity now"
 
 count = 0
 for key in keys:
@@ -250,8 +270,6 @@ for key in keys:
         count+=1
         continue
     doc = nlp(text)
-
-    print ("======================= EMAIL SUMMARY====================================")
     for ent in doc.ents:
 
         if  (ent.label_ == 'PERSON'):
@@ -261,9 +279,9 @@ for key in keys:
             word = re.sub("[^a-zA-Z]+"," ", word)
             if check_for_name_length(word):
                 word=word.lower()
-            	if word in people_dict:
-                	email_entity_dict[int(key)]['Names'].append(word)
-                	print ("PERSON: " + word)
+                if word in people_dict:
+                    email_entity_dict[int(key)]['Names'].append(word)
+                    email_vs_entity_alone[int(key)].append(word)
 
         if  (ent.label_ == 'GPE'):
             word = ent.text
@@ -273,8 +291,9 @@ for key in keys:
             if check_noise(word):
                 word = word.lower()
             	if word in place_dict:
-                	email_entity_dict[int(key)]['Places'].append(place_dict[word])
-                	print ("PLACE: " + place_dict[word])
+                    email_entity_dict[int(key)]['Places'].append(place_dict[word])
+                    email_vs_entity_alone[key].append(place_dict[word])
+
 
     
         if  (ent.label_ =='ORG'):
@@ -286,7 +305,8 @@ for key in keys:
                 word=word.lower()
                 if word in org_dict:
                     email_entity_dict[int(key)]['Org'].append(org_dict[word])
-                    print ("ORG: " + org_dict[word])
+                    email_vs_entity_alone[key].append(org_dict[word])
+
 
 
 
@@ -298,7 +318,8 @@ for key in keys:
                     word = token.text.lower()
                     if word in interest_expertise:
                     	email_entity_dict[int(key)]['Entities'].append(word)
-                        print ("ENTITY: " + word)
+                        email_vs_entity_alone[key].append(word)
+
 
     count +=1
 
@@ -315,5 +336,6 @@ print ("Time taken for processing " + str (B-A) + " secs.")
 dump ='/Users/Dhanush/Desktop/Enron_Data/pickle/'
 
 print ("Initializing the Data dumps")
-joblib.dump(email_entity_dict, dump+'Email_Entity_Mapping.pkl')
+#joblib.dump(email_entity_dict, dump+'Email_Entity_Mapping.pkl')
+joblib.dump(email_vs_entity_alone, dump+'email_vs_entity_alone.pkl')
 print ("")
