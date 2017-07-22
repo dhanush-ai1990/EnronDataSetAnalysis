@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+
+<script src="https://code.jquery.com/jquery-3.1.1.js"
+          integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+          crossorigin="anonymous"></script>
+    <head>
+
+</head>
+
+<body onload="requestSearch()">
+<script>
+function requestSearch() {
+  var SEARCH_ENDPOINT = "http://35.163.124.249:8080/search";
+
+
+  var input = {
+      "searchtype":"GS",
+      "query": "Who is interested in oil ?",
+      "restrict": ['PERSON'],  
+    }
+  jQuery.support.cors = true;
+
+  
+  var settings = {
+    data: JSON.stringify(input),
+    success: searchSuccess,
+    error: searchError,
+    type: 'POST'
+
+  }
+  
+  jQuery.ajax(SEARCH_ENDPOINT, settings) 
+}
+
+
+function searchSuccess(data, textStatus, jqXHR) {
+  console.log(data);
+}
+function searchError(jqXHR, error, errorThrown) {
+  console.log(jqXHR);
+   console.log(error);
+}
+
+</script>
+
+</body>
+
+</html>

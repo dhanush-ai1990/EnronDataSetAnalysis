@@ -30,6 +30,7 @@ for line in place_file:
 	key=key.strip()
 	key=key.strip()
 	key = key.lower()
+
 	name = line[1]
 	name = name.strip()
 	name=name.strip()
@@ -107,7 +108,7 @@ counter = Counter(data)
 counter_selected = 	counter.most_common(5000)
 list_selected = []
 
-count = 0
+res = 0
 dictionary_of_places = {}
 tag_vs_name = {}
 for i in counter_selected:
@@ -133,6 +134,8 @@ for i in counter_selected:
 
 		print (dictionary_of_places[dict1[word]]['name'])
 		continue
+	if res >5000:
+		continue
 	word = i[0]
 	out= google_KG_search(word,type_data)
 	if len(out) > 0:
@@ -149,8 +152,9 @@ for i in counter_selected:
 			dictionary_of_places[out[0]]['count']+= int(i[1])
 
 		tag_vs_name[i[0]] = out[0]
+	res+=1
 
-		print (dictionary_of_places[out[0]]['name'])
+		#print (dictionary_of_places[out[0]]['name'])
 		
 
 

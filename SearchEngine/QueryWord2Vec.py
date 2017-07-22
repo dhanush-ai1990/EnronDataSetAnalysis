@@ -13,7 +13,7 @@ from nltk.tokenize import *
 from nltk.tag import pos_tag
 
 
-model = gensim.models.Word2Vec.load('model')
+model = gensim.models.Word2Vec.load('/Users/Dhanush/Desktop/Enron_Data/Models/wordvecmodel')
 nlp = spacy.load('en')
 
 
@@ -106,7 +106,7 @@ def fetch_type(word):
 	return word
 
 
-def identify(query,restrict):
+def GeneralSearch(query,restrict):
 
 	# In word2Vec model person and topics are lower but org and 
 
@@ -181,7 +181,6 @@ def identify(query,restrict):
 
 
 
-	print entity_list
 	results_query = []
 	for items in entity_list:
 		try:
@@ -220,7 +219,7 @@ def identify(query,restrict):
 
 
 #print identify("'Jeana Mac",['PLACE'])
-print identify("Jeana Mac",['ORG'])
+print GeneralSearch("Jeana Mac",['ORG'])
 
 #print get_similiar_entity('tom talley')
 

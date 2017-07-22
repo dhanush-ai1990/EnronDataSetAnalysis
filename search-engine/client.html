@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!-- Meta, title, CSS, favicons, etc. -->
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>SPAI</title>
+
+        <link rel="shortcut icon" href="http://icanbecreative.com/resources/images/favico.ico" />
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+        <!-- Bootstrap -->
+        <link href="static/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link href="static/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+        <!-- NProgress -->
+        <link href="static/vendors/nprogress/nprogress.css" rel="stylesheet">
+        <!-- bootstrap-daterangepicker -->
+        <link href="static/vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+        
+        <!-- Custom Theme Style -->
+        <link href="static/styles/custom.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="static/styles/mainStyle.css">
+
+        
+    </head>
+
+    <body >
+
+    <div class="container body">
+      <div class="main_container">
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="">
+
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>Client Information <small>Activity report</small></h2>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+                  <!-- main page -->
+                    <div class="row">
+                      <!-- user info -->
+                      <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+                        <div class="profile_img">
+                          <div id="crop-avatar">
+                            <img class="img-responsive avatar-view" src="static/images/RBC.png" alt="Avatar" title="Change the avatar">
+                          </div>
+                        </div>
+                        <h4>Royal Bank of Canada</h4>
+
+                        <ul class="list-unstyled user_data">
+
+                          <li><i class="fa fa-map-marker user-profile-icon"></i> Toronto, Ontario, CA
+                          </li>
+                          <li>
+                            <i class="fa fa-building user-profile-icon"></i> Financial services company
+                          </li>
+
+                        </ul>
+                        <br />
+                      </div>
+                      <!-- user info -->
+                      <!-- main content -->
+                      <div class="col-md-9 col-sm-9 col-xs-12">
+                        <!-- bar chart -->
+                        <div class="row">
+                          <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="x_panel custom_panel">
+                              <div class="profile_title">
+                                <div class="col-md-12">
+                                  <h2>User Activity Report</h2>
+                                </div>
+                              </div>
+                              <div class="x_content">
+                                <canvas id="lineChart"></canvas>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- bar chart -->
+                        <!-- top pepople -->
+                        <div class="row">
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_panel custom_panel">
+                              <div class="profile_title">
+                                <div class="col-md-12">
+                                  <h2>Top collaborators from RBC</h2>
+                                </div>
+                              </div>
+                              <div class="x_content">
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    1
+                                  </a>
+                                  <div class="media-body">
+                                    <a href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    2
+                                  </a>
+                                  <div class="media-body">
+                                    <a href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    3
+                                  </a>
+                                  <div class="media-body">
+                                    <a href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    4
+                                  </a>
+                                  <div class="media-body">
+                                    <a href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    5
+                                  </a>
+                                  <div class="media-body">
+                                    <a href="#">Item Three Title</a>
+                                  </div>
+                                </article>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="x_panel custom_panel">
+                              <div class="profile_title">
+                                <div class="col-md-12">
+                                  <h2>Top collaborators from Enron</h2>
+                                </div>
+                              </div>
+                              <div class="x_content">
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    1
+                                  </a>
+                                  <div class="media-body">
+                                    <a class="title" href="#">Item One Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    2
+                                  </a>
+                                  <div class="media-body">
+                                    <a class="title" href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    3
+                                  </a>
+                                  <div class="media-body">
+                                    <a class="title" href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    4
+                                  </a>
+                                  <div class="media-body">
+                                    <a class="title" href="#">Item Two Title</a>
+                                  </div>
+                                </article>
+                                <article class="media event">
+                                  <a class="pull-left date">
+                                    5
+                                  </a>
+                                  <div class="media-body">
+                                    <a class="title" href="#">Item Three Title</a>
+                                  </div>
+                                </article>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- top people -->
+                        <!-- user interests -->
+                        <div class="row">
+                          <div class="col-md-6 col-sm-6 col-xs-12">
+                            <div class="profile_title">
+                              <div class="col-md-6">
+                                  <h2>User Interset</h2>
+                              <div class="clearfix"></div>
+                              </div>
+                            </div>
+                            <div class="x_panel custom_panel">
+                              <div class="x_content">
+
+                                  <ul class="list-unstyled user_data">
+                                        <li>
+                                          <p>Web Applications</p>
+                                          <div class="progress progress_sm">
+                                            <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50"></div>
+                                          </div>
+                                        </li>
+                                        <li>
+                                          <p>Website Design</p>
+                                          <div class="progress progress_sm">
+                                            <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="70"></div>
+                                          </div>
+                                        </li>
+                                        <li>
+                                          <p>Automation & Testing</p>
+                                          <div class="progress progress_sm">
+                                            <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="30"></div>
+                                          </div>
+                                        </li>
+                                        <li>
+                                          <p>UI / UX</p>
+                                          <div class="progress progress_sm">
+                                            <div class="progress-bar bg-green" role="progressbar" data-transitiongoal="50"></div>
+                                          </div>
+                                        </li>
+                                      </ul>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- user interests -->
+                      </div>
+                      <!-- main content -->
+                    </div>
+                    <!-- main page -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+      </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="static/dist/alchemy.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alchemyjs/0.4.2/scripts/vendor.js"></script>
+    <script src="static/scripts/alchemy.js"></script>
+    <!-- Bootstrap -->
+    <script src="static/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="static/vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="static/vendors/nprogress/nprogress.js"></script>
+    <!-- morris.js -->
+    <script src="static/vendors/raphael/raphael.min.js"></script>
+    <script src="static/vendors/morris.js/morris.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="static/vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="static/vendors/moment/min/moment.min.js"></script>
+    <script src="static/vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- Chart.js -->
+    <script src="static/vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- Custom Theme Scripts -->
+    <script src="static/scripts/custom.min.js"></script>
+
+
+
+  </body>
+
+</html>

@@ -336,6 +336,6 @@ print ("Time taken for processing " + str (B-A) + " secs.")
 dump ='/Users/Dhanush/Desktop/Enron_Data/pickle/'
 
 print ("Initializing the Data dumps")
-#joblib.dump(email_entity_dict, dump+'Email_Entity_Mapping.pkl')
+joblib.dump(email_entity_dict, dump+'Email_Entity_Mapping.pkl')
 joblib.dump(email_vs_entity_alone, dump+'email_vs_entity_alone.pkl')
 print ("")
