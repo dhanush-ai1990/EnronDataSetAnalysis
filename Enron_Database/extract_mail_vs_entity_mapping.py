@@ -317,6 +317,7 @@ for key in keys:
                 if (token.tag_ == "NNP") or (token.tag_ == "NNPS")or (token.tag_ == "NN"):
                     word = token.text.lower()
                     if word in interest_expertise:
+                        #Fraud and Banruptcy are of interests to Enron
                     	email_entity_dict[int(key)]['Entities'].append(word)
                         email_vs_entity_alone[key].append(word)
 
