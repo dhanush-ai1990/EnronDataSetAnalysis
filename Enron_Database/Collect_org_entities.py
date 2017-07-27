@@ -100,17 +100,19 @@ def check_noise(word):
     return True
 
 data= joblib.load('/Users/Dhanush/Desktop/Enron_Data/pickle/Org.pkl')
+
 data =[element.lower() for element in data]
 print (len(data))
 
 counter = Counter(data)
 
-counter_selected = 	counter.most_common(5000)
+counter_selected = 	counter.most_common(10000)
 list_selected = []
 
 res = 0
 dictionary_of_places = {}
 tag_vs_name = {}
+mandatory =['rbcds.com','rbc.com','rbcinvestments.com','rbcdain.com','rbc confirm','rbc capital partners telecom fund','rbc capital markets','rbc capital markets vice']
 for i in counter_selected:
 
 	word = i[0].lower()
@@ -118,6 +120,10 @@ for i in counter_selected:
 	word = word.strip()
 	word = word.strip()
 	word = word.strip()
+	if res >2000:
+		if word not in mandatory:
+			continue
+
 	if word in dict1:
 		if dict1[word] not in dictionary_of_places:
 			dictionary_of_places[dict1[word]] = {}
@@ -133,9 +139,6 @@ for i in counter_selected:
 		tag_vs_name[i[0]] = dict1[word]
 
 		print (dictionary_of_places[dict1[word]]['name'])
-		continue
-	if res >5000:
-		continue
 	word = i[0]
 	out= google_KG_search(word,type_data)
 	if len(out) > 0:

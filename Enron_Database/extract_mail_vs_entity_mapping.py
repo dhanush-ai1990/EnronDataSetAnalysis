@@ -223,7 +223,11 @@ hold = None
 flag = False
 
 "Processing database"
+
+#load the mapped Employee dictionary
+email_dict= joblib.load('/Users/Dhanush/Desktop/Enron_Data/Outputs/employee_dict_email.pkl')
 for record in c:
+    temp_org =[]
     MSGID = int(record[0])
 
     if MSGID not in keys:
@@ -247,18 +251,32 @@ for record in c:
 
         if flag == True:
             email_vs_entity_alone[MSGID].append(record[5])
+            try:
+                email_vs_entity_alone[MSGID].append(email_dict[record[1]]['org'])
+                email_entity_dict[MSGID]['Org'].append(email_dict[record[1]]['org'])
+            except KeyError:
+                blah=0
+
     if record[6] == '**' or record[7] == "**":
     		placeholder =0
     else:
     	email_entity_dict[MSGID]['receiver_name'].append(record[8])
         email_vs_entity_alone[MSGID].append(record[8])
+        
 
     email_entity_dict[MSGID]['receiver_email'].append(record[2])
+    try:
+        email_vs_entity_alone[MSGID].append(email_dict[record[2]]['org'])
+        email_entity_dict[MSGID]['Org'].append(email_dict[record[2]]['org'])
+    except KeyError:
+        continue
 
 
    
 print "Processing the entity now"
 
+mandatory =['rbcds.com','rbc.com','rbcinvestments.com','rbcdain.com','rbc confirm','rbc capital partners telecom fund','rbc capital markets','rbc capital markets vice']
+temp_mapped ={'rbcds.com':'RBC Dominion Securities','rbc.com':'Royal Bank of Canada','rbcinvestments.com':'Royal Bank of Canada','rbcdain.com':'Royal Bank of Canada','rbc confirm':'Royal Bank of Canada','rbc capital partners telecom fund':'RBC CAPITAL MARKETS','rbc capital markets':'RBC CAPITAL MARKETS','rbc capital markets vice':'RBC CAPITAL MARKETS'}
 count = 0
 for key in keys:
 
@@ -282,6 +300,10 @@ for key in keys:
                 if word in people_dict:
                     email_entity_dict[int(key)]['Names'].append(word)
                     email_vs_entity_alone[int(key)].append(word)
+                if word == 'mark easterbrook':
+                    email_entity_dict[int(key)]['Names'].append('mark easterbrook')
+                    email_vs_entity_alone[int(key)].append('mark easterbrook')
+                    print word
 
         if  (ent.label_ == 'GPE'):
             word = ent.text
@@ -306,6 +328,13 @@ for key in keys:
                 if word in org_dict:
                     email_entity_dict[int(key)]['Org'].append(org_dict[word])
                     email_vs_entity_alone[key].append(org_dict[word])
+                elif word in mandatory:
+                    email_entity_dict[int(key)]['Org'].append(temp_mapped[word])
+                    email_vs_entity_alone[key].append(temp_mapped[word])
+                    print word
+                else:
+                    continue
+
 
 
 
