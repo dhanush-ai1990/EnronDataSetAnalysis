@@ -14,7 +14,7 @@ from nltk.tag import pos_tag
 import urllib
 import urllib2
 import json
-
+from nltk import ngrams
 
 api_key ='AIzaSyAXSTt536rRbl4dK4pzuPs-QfuGKTT-YBk'
 type_data= ['Corporation','Organization','GovernmentOrganization','EducationalOrganization','LocalBusiness','SportsTeam']
@@ -91,7 +91,6 @@ model = gensim.models.Word2Vec.load(file_loc+'wordvecmodel')
 nlp = spacy.load('en')
 
 
-print ("Word2Vec and Entity mapping Loaded")
 
 
 #Load the file of exception
@@ -103,6 +102,7 @@ for line in exception_file:
     exception.append(line)
 exception = list(set(exception)) + ['ECT','Enron']
 exception =[element.lower() for element in exception]
+
 #print exception
 #print len(exception)
 
@@ -112,16 +112,17 @@ exception =[element.lower() for element in exception]
 mapping_to_type_dict=joblib.load(file_loc+'mapping_to_type_dict.pkl')
 people_interest     =joblib.load(file_loc+'people_interest.pkl')
 org_interest        =joblib.load(file_loc+'org_interest.pkl')
-experts             =joblib.load(file_loc+'experts.pkl')
+experts_dict        =joblib.load(file_loc+'experts.pkl')
 org_enron_contact   =joblib.load(file_loc+'org_enron_contact.pkl') 
 enron_table 		=joblib.load(file_loc+'enron_table.pkl') 
 other_org_table		=joblib.load(file_loc+'other_org_table.pkl')
 SearchEngineWordList=joblib.load(file_loc+'SearchEngineWordList.pkl')
-
+SearchEngineWordList.pop('hughes')
+SearchEngineWordList.pop('the')
 #lets have a mapping of people to their expertise
 people_expertise ={}
-for entity in experts:
-	for item in experts[entity]:
+for entity in experts_dict:
+	for item in experts_dict[entity]:
 		if item[0] not in people_expertise:
 			people_expertise[item[0]] =[]
 			people_expertise[item[0]].append(entity)
@@ -149,29 +150,57 @@ for org in org_interest:
 
 
 
+print ("Backend Loaded")
 
 
+threshold = {'energy' : 0.55,'oil' : 0.75,'utility':0.65,'power' : 0.40,'law': 0.30}
+
+def entity(word):
+	vector = model.wv[word]
+	list_words =  model.similar_by_vector(vector, topn=100, restrict_vocab=None)
+	results = []
+	score = 0.55
+	if word in threshold:
+		score = threshold[word]
+	for item in list_words:
+		try:
+
+			if (str(item[0]) == word):
+				continue
+			if (str(item[0])) in exception:
+				continue
+			if (float(item[1]) > score) and (fetch_type(str(item[0])) == "TOPIC"):
+				results.append([str(item[0]),"E"])
+			if (float(item[1]) < score) and (fetch_type(str(item[0])) == "TOPIC"):
+				results.append([str(item[0]),"I"])
+		except UnicodeEncodeError:
+			continue
+	return results
 
 
+			
 
-
-print ("All pickle Loaded")
 
 def get_similiar_entity(word):
 	vector = model.wv[word]
 	list_words =  model.similar_by_vector(vector, topn=300, restrict_vocab=None)
 	results = []
+	score = 0.55
+	if word in threshold:
+		score = threshold[word]
 	for item in list_words:
 
 		try:
+			if (str(item[0]))in exception:
+				continue
 
 			if (str(item[0]) == word):
 				continue
-			if (float(item[1]) > 0.55) and (fetch_type(str(item[0])) == "PERSON"):
+			if (float(item[1]) > score) and (fetch_type(str(item[0])) == "PERSON"):
 				name =str(item[0]).replace(" ", "")
 				results.append([str(item[0]), "Expert",fetch_type(str(item[0])),name+"@enron.com","Enron","Employee"])
 
-			elif (float(item[1]) < 0.55) and (fetch_type(str(item[0])) == "PERSON"):
+			elif (float(item[1]) < score) and (fetch_type(str(item[0])) == "PERSON"):
 				name =str(item[0]).replace(" ", "")
 				results.append([str(item[0]), " Interest " ,fetch_type(str(item[0])),name+"@enron.com","Enron","Employee"])
 
@@ -215,52 +244,72 @@ def find_interest(org):
 
 
 
-def fetch_person_details(person):
+def fetch_person_details(person,expert_flag,entity_list):
 	person = person.lower()
 	type1='PERSON'
-	pic_url ='http://1.bp.blogspot.com/-vcxXefp0Yto/Uxi1V1NJKJI/AAAAAAAAAPo/EZcRSGFp52A/s1600/face.jpeg'
 	name =person.title()
 	organization =""
 	email = ""
 	if person in enron_table:
-		organization = 'Enron Corporation'
 		email = enron_table[person][1]
+		test =email.split('@')
+		test = test[1]
+		test = test.split('.')
+		if test[0].lower() != 'enron':
+			organization = test[0].title()
+		else:
+			organization = 'Enron Corporation'
+
 
 	elif person in other_org_table:
 		organization = other_org_table[person].title()
 		email = other_org_table[person][1]
 	else:
-		organization = find_org(person)
-		split = organization.split(" ")
-		if len(split) < 2:
-			email_name = person.replace(" ", "")
-			email = email_name +'@'+organization.lower()+'.com'
+		organization = ''
+		email_name = person.replace(" ", "")
+		email = ""
 
+	if (expert_flag =='Y') and (organization != 'Enron Corporation'):
+		return []
+		
+
+	results = entity(person)
+	interests =[]
+	expertise = []
+	if expert_flag =='Y':
+		expertise.append(entity_list[0].title())
+	for result in results:
+		if result[1] == "E":
+			if len(expertise) < 3:
+				expertise.append(result[0].title())
+		if result[1] == "I":
+			if len(interests) < 3:
+				interests.append(result[0].title())
+	if len(interests) == 0:
+		if person in people_interest:
+			interests = people_interest[person]
+		temp =[]
+		for interest in interests:
+			if interest[0] == 'fraud' or interest[0] == 'internet' or interest[0] == 'commission' or  interest[0] == "frauds":
+				continue
+			else:
+				temp.append(interest[0])
+		if len(interests) >3:
+			interests = temp[0:3]
 		else:
-			#We create the abbreviation for the email.
-			agg =[]
-			for word in split:
-				agg.append(word[0])
-			agg ="".join(agg)
-			email_name = person.replace(" ", "")
-			email = email_name +'@'+agg.lower()+'.com'
+			interests=temp
 
-
-
-	expertise =[]
-	if person in people_expertise:
-		expertise = people_expertise[person]
-	expertise =[element.title() for element in expertise]
-	interests = []
-	if person in people_interest:
-		interests = people_interest[person]
 	temp =[]
-	for element in interests:
-		temp.append(element[0])
+	for expert in expertise:
+		if expert == 'fraud' or expert == 'internet' or expert == 'commission' or expert == 'frauds':
+			continue
+		else:
+			temp.append(expert)
 
-	interests =[element.title() for element in temp]
+	expertise = list(set(expertise))
+	interests=list(set(interests))
 
-	return [type1,name,organization,email,expertise,interests,pic_url]
+	return [type1,name,organization,email,expertise,interests]
 
 def fetch_org_details(org):
 	out = google_KG_search(org,type_data)
@@ -292,18 +341,37 @@ def fetch_org_details(org):
 
 
 
-		
+def find_org_entity(entity):
+	try:
+		results_org=get_similiar_entity(entity.lower())
+	except:
+		return []
+	temp =[]
+	for result in results_org:
+		if result[2] == 'ORG':
+			if result[0] not in exception:
+				temp.append(result[0].title())
+	return temp	
 
 
 def fetch_topic_details(entity):
 	name = entity.title()
-	experts = experts[entity]
+	experts = experts_dict[entity.lower()]
+	temp =[]
+	for expert in experts:
+		temp.append(expert[0].title())
+	experts = temp
 	if len(experts) > 6:
 		experts = experts[0:5]
-	interests= entity_interests[entity]
+	interests= entity_interests[entity.lower()]
+	temp = []
+	for interest in interests:
+		temp.append(interest[0].title())
+	interest = temp
+
 	if len(interests) > 6:
 		interests = interests[0:5]
-	organization_interested = org_interest[entity]
+	organization_interested = find_org_entity(entity)
 	if len(organization_interested) > 6:
 		organization_interested = organization_interested[0:5]
 	return [name,experts,interests,organization_interested]
@@ -337,21 +405,26 @@ def GeneralSearch(query,restrict):
 	text = unicode(query,'utf8')
 	doc = nlp(text)
 	entity_unknown=[]
+
+
+	if len(entity_list) == 0:
+
+		bigrams = ngrams(text.split(), 2)
+		for grams in bigrams:
+				word=" ".join(grams)
+				if word.lower() in SearchEngineWordList:
+					
+					if mapping_to_type_dict[word.lower()] =='PERSON':
+						entity_searched_type.append("PERSON")
+						entity_list.append(word.lower())
+					break
+
 	for ent in doc.ents:
 		entity_unknown.append(ent.text)
 
-		if  (ent.label_ == 'PERSON'):
-			word = ent.text
 
-			word=word.lower()
-			
-			entity_list.append(word)
-			entity_searched_type.append("PERSON")
 
 		word = ent.text
-		if word in mapping_to_type_dict:
-			entity_list.append(word.title())
-
 
 		if  (ent.label_ == 'GPE'):
 			word = ent.text
@@ -384,21 +457,6 @@ def GeneralSearch(query,restrict):
 
 	#We have mostly identified our query by now. All below process includes back up routines to capture
 	#the entity being searched
-
-	if len(entity_list) ==0:
-		print "Houston! We have a problem :("
-		for item in entity_unknown:
-			print item
-			out= google_KG_search(word,type_data)
-			print out
-			if out ==None:
-				continue
-			else:
-				entity_list.append(out[0].title())
-	
-
-
-
 	#Now lets do the Word2Vec Queries.
 	#double check to see if its a single search
 
@@ -411,11 +469,10 @@ def GeneralSearch(query,restrict):
 	token_list = query.split()
 	token_list=[x.lower() for x in token_list]
 	for token in token_list:
-		if (token == 'interest') or  (token == 'interested') or (token=='deals') or (token =='deal'):
+		if (token == 'interest') or  (token == 'interested') or (token=='deals') or (token =='deal')or (token =='interests'):
 			people_flag = 'Y'
 		if (token =='expert') or (token =='expertise') or (token =='experts'):
 			expert_flag = 'Y'
-		print expert_flag
 		if (token =='place') or (token =='places') or (token =='location') or (token =='locations'):
 			place_flag = 'Y'
 		if (token == 'org') or (token =='organization') or (token =='organizations') or (token =='company') or (token =='companies'):
@@ -432,19 +489,19 @@ def GeneralSearch(query,restrict):
 
 			if (entity_searched_type[0]== "PERSON") and (expert_flag=='Y'):
 				restrict.append('TOPIC')
-				expert_flag = 'N'
+				expert_flag ='N'
 
 		if org_flag == 'Y':
 			restrict.append('ORG')
-			print "a"
+
 
 		if place_flag =='Y':
 			restrict.append('PLACE')
-			print "b"
+
 
 		if people_flag == 'Y':
 			restrict.append('PERSON')
-			print "c"
+
 
 
 
@@ -453,10 +510,13 @@ def GeneralSearch(query,restrict):
 
 	results_query = []
 	for items in entity_list:
-		try:
-			results_query+=(get_similiar_entity(items))
-		except KeyError:
-			continue
+		if items in SearchEngineWordList:
+			try:
+				results_query+=(get_similiar_entity(items))
+			except KeyError:
+				continue
+
+
 
 
 	if len(results_query) == 0:
@@ -467,19 +527,16 @@ def GeneralSearch(query,restrict):
 	Intermediate_result = results_query
 
 
-
-	
 	#Put the routine to call dictionary to get the experts in a Topic, below will be depreciated ! This is put on hold now
 	#We can use the expert dictionary if needed.
+	print "flag is " + expert_flag
 	if expert_flag =='Y':
 		temp_result = []
-
 		for result in Intermediate_result:
 			if result[1] == 'Expert':
 				temp_result.append(result)
 
 		Intermediate_result = temp_result
-
 
 	if (restrict is not None) or (len(restrict) > 0):
 		final_result =[]
@@ -503,15 +560,17 @@ def GeneralSearch(query,restrict):
 			filter_result.append([name,result[2]])
 
 	#We need to send only first 50 results.
-	if len(filter_result) >50:
-			filter_result = filter_result[0:49]
+	if len(filter_result) >20:
+			filter_result = filter_result[0:19]
 
 
 	#Now we fetch more details about our entities and return them.
 	More_details =[]
+
+	print expert_flag
 	for result in filter_result:
 		if result[1] == 'PERSON':
-			More_details.append(fetch_person_details(result[0]))
+			More_details.append(fetch_person_details(result[0],expert_flag,entity_list))
 		if result[1] == 'ORG':
 			More_details.append(fetch_org_details(result[0]))
 
@@ -521,7 +580,16 @@ def GeneralSearch(query,restrict):
 		if result[1] == 'PLACE':
 			More_details.append(fetch_place_details(result[0]))
 
-
+	if expert_flag =='Y' and len(More_details) == 0:
+		results = experts_dict[entity_list[0]]
+		for result in results:
+			More_details.append(fetch_person_details(result[0],expert_flag,entity_list))
+	if expert_flag =='N' and len(More_details) == 0 and restrict[0] =='TOPIC':
+		results = people_interest[entity_list[0]]
+		for result in results:
+			if result[0] == 'fraud' or result[0] == 'internet' or result[0] == 'commission' or  result[0] == "frauds":
+				continue
+			More_details.append(fetch_topic_details(result[0]))
 
 	return More_details
 
@@ -581,7 +649,25 @@ def GeneralSearch(query,restrict):
 	"""
 	
 
-print GeneralSearch("who is interested in oil",[])
+#print GeneralSearch("who is interested in power",[])
+#print GeneralSearch("who has expertise in law",[])
+#print GeneralSearch("who has interest in utility related topics",[])
+#print GeneralSearch("who has expertise in utility related topics",[])
+#print GeneralSearch("who is an expert in power",[])
+#print GeneralSearch("who has expertise in energy",[])
+#print GeneralSearch("what expertise does chakib khelil have",[])
+#print GeneralSearch("what expertise does Hugo Chavez have",[])
+#print GeneralSearch("what are the interests of Hugo Chavez ?",[])
+print GeneralSearch("what expertise does Matt Hughes have",[])
+#print get_similiar_entity("chakib khelil")
+
+
+
+#what are the interests of a person
+#what are the expertise of a person
+# what are the organizations a person deal with
+#what are the interests of a organization
+
 
 
 
