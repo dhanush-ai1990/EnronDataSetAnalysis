@@ -46,7 +46,7 @@ c.execute(SQL)
 #/Users/Dhanush/desktop/
 
 
-model = gensim.models.Word2Vec.load('wordvecmodel')
+#model = gensim.models.Word2Vec.load('wordvecmodel')
 mapping_to_type_dict= joblib.load('mapping_to_type_dict.pkl')
 
 """
@@ -72,14 +72,15 @@ for record in c:
 	if record[2] =='**':
 		continue
 	org = record[4].lower()
-	if record[4] == 'enron':
-		enron_table[record[3]] =[]
-		enron_table[record[3]].append('enron')
-		enron_table[record[3]].append(record[0])
+	print org
+	if org == 'enron':
+		enron_table[record[3].lower()] =[]
+		enron_table[record[3].lower()].append('enron')
+		enron_table[record[3].lower()].append(record[0])
 	else:
-		enron_table[record[3]] =[]
-		enron_table[record[3]].append(record[4])
-		enron_table[record[3]].append(record[0])
+		other_org_table[record[3].lower()] =[]
+		other_org_table[record[3].lower()].append(record[4])
+		other_org_table[record[3].lower()].append(record[0])
 
 joblib.dump(enron_table,'enron_table.pkl')
 joblib.dump(other_org_table,'other_org_table.pkl')
