@@ -840,6 +840,15 @@ def PeopleSearch(word):
 This returns the Organization results from before, with colloborators from enron and from the organization. Along with interests of Org
 
 """
+
+
+def Convert2Dict(list1):
+	result = {}
+	for item in list1:
+		result[item[0]] = item[1]
+
+	return result
+
 def OrgSearch(word):
 	file_name = org_loc + word +".txt"
 	F = open(file_name, "r").readlines()
@@ -1011,8 +1020,14 @@ def OrgSearch(word):
 
 	#Lets make the JSON for the Organization cluster Map
 	#===================================================
-	json = {'name' : name,'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'interests' :accum_interests ,'places': accum_places }
 
+	json = {'name' : name,'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'interests' :accum_interests ,'places': accum_places }
+	Clients =Convert2Dict(accum_employee)
+	Enron_People = Convert2Dict(accum_enron_employee)
+	places = Convert2Dict(accum_places)
+	similiar_topics= Convert2Dict(accum_interests)
+	#json = {'name' : word.title(),'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'similiarinterests' :accum_interests ,'places': accum_places,'orgs':accum_org_updated}
+	json = [Clients,Enron_People,places,similiar_topics]
 
 	return [name,type1,description,link,image,interest,employees,contact_enron,places],json
 
@@ -1026,6 +1041,8 @@ def OrgSearch(word):
 
 
 """
+
+
 
 
 def KG_search_for_topic_page(word):
@@ -1069,8 +1086,30 @@ def KG_search_for_topic_page(word):
 
 	except KeyError:
 		name= None
-
+	if name!= None:
+		name = name.title().encode("utf-8")
 	return name
+
+
+
+
+def mean_normalize(json):
+	list_scores =[]
+	for dictionary in json:
+		for item in dictionary:
+			list_scores.append(dictionary[item])
+	max_value = max(list_scores)
+	min_value = min(list_scores)
+	#avg = float(sum(list_scores))/len(list_scores)
+	for dictionary in json:
+		for item in dictionary:
+			#score = dictionary[item]/float(avg)
+			score = (1)/(max_value-min_value)*(dictionary[item]-min_value)
+			#score = (dictionary[item] - min_value)/float(max_value -min_value)
+			dictionary[item] = score
+
+
+	return json
 
 def TopicSearch(word):
 	searchword = word.lower()
@@ -1089,31 +1128,31 @@ def TopicSearch(word):
 			if (str(item[0]))in exception:
 				continue
 
-			if (str(item[0]) == word):
+			if (item[0].title == word):
 				continue
 
 			if (fetch_type(str(item[0])) == "TOPIC"):
-				accum_interests.append([item[0].title(),item[1]])
+				accum_interests.append([item[0].title().encode("utf-8"),item[1]])
 
 			if (fetch_type(str(item[0])) == "PLACE"):
-				accum_places.append([item[0].title(),item[1]])
+				accum_places.append([item[0].title().encode("utf-8"),item[1]])
 
 			if (fetch_type(str(item[0])) == "ORG"):
-				accum_org.append([item[0].title(),item[1]]))
+				accum_org.append([item[0].title(),item[1]])
 
 			if (fetch_type(str(item[0])) == "PERSON"):
 
 				if item[0] in enron_table:
-					accum_enron_employee.append([item[0].title(),item[1]])
+					accum_enron_employee.append([item[0].title().encode("utf-8"),item[1]])
 				else:
-					accum_employee.append([item[0].title(),item[1]])
+					accum_employee.append([item[0].title().encode("utf-8"),item[1]])
 	
 		except UnicodeEncodeError:
 			continue
 
 
-	if len(accum_interests) > 3:
-		accum_interests = accum_interests[0:3]
+	if len(accum_interests) > 5:
+		accum_interests = accum_interests[0:4]
 	if len(accum_employee) > 15:
 		accum_employee = accum_employee[0:14]
 	if len(accum_enron_employee) > 15:
@@ -1121,8 +1160,8 @@ def TopicSearch(word):
 	if len(accum_places) > 10:
 		accum_places = accum_places[0:9]
 
-	if len(accum_org) > 5:
-		accum_org = accum_org[0:4]
+	if len(accum_org) > 10:
+		accum_org = accum_org[0:9]
 
 	enron_name = []
 	other_name = []
@@ -1132,11 +1171,11 @@ def TopicSearch(word):
 
 	if len(accum_interests) !=0:
 		for item in accum_interests:
-			similiar_entity.append(item[0].title())
+			similiar_entity.append(item[0].title().encode("utf-8"))
 
 	if len(accum_employee) !=0:
 		for item in accum_employee:
-			other_name.append(item[0].title())
+			other_name.append(item[0].title().encode("utf-8"))
 
 	if len(accum_enron_employee) !=0:
 		for item in accum_enron_employee:
@@ -1146,15 +1185,183 @@ def TopicSearch(word):
 		for item in accum_places:
 			places.append(item[0].title())
 
+	accum_org_updated =[]
+	if len(accum_org) !=0:
+		temp =[]
+		for item in accum_org:
+			temp.append(item[0].title())
+			name = KG_search_for_topic_page(item[0])
+			if name == None:
+				continue
+
+			accum_org_updated.append([name,item[1]])
+			orgs.append(name)
+
+		if len(accum_org_updated) == 0:
+			accum_org_updated = accum_org
+			orgs = temp
 
 
 	#We need to leverage the Google Knowledge Graph now to get better results for the Organizations
 
 	output_array = [word.title(),similiar_entity,enron_name,other_name,places,orgs]
-	json = {'name' : word.title(),'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'similiarinterests' :accum_interests ,'places': accum_places,'orgs':accum_org}
+	Clients_dict =Convert2Dict(accum_employee)
+	Enron_People_dict = Convert2Dict(accum_enron_employee)
+	places_dict = Convert2Dict(accum_places)
+	orgs_dict = Convert2Dict(accum_org_updated)
+	temp =[]
+	if len(accum_interests) !=0:
+		temp =[]
+		for item in accum_interests:
+			if item[0].lower() == word.lower():
+				continue
+			else:
+				temp.append(item)
+		accum_interests = temp
+	similiar_topics_dict= Convert2Dict(accum_interests)
 
+	#json = {'name' : word.title(),'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'similiarinterests' :accum_interests ,'places': accum_places,'orgs':accum_org_updated}
+	json = [Clients_dict,Enron_People_dict,places_dict,orgs_dict,similiar_topics_dict]
+
+	json = mean_normalize(json)
+
+	print json
 	return output_array,json
 
+
+
+def GenerateTopicClusterMap():
+	start_word = 'oil'
+	# we need to set the distance of other entities from this cluster
+	# We select a 
+	list_topics = ['gas','fuel','energy','power','transmission','wind','utilities','legal','technology','finance','security','operation','equity','accounting','asset','marketing','administration','revenue','insurance','investment','trade']
+	entity_score = []
+	for entity in list_topics:
+		score =model.similarity(start_word, entity)
+		entity_score.append([entity,score])
+
+	entity_score=sorted(entity_score,key=lambda l:l[1], reverse=True)
+	entity_score_dict = Convert2Dict(entity_score)
+	dup_person =[]
+	dup_places =[]
+	dup_org =[]
+
+
+	list_for_all_entities = []
+	for item in list_topics:
+		searchword = item.lower()
+		vector = model.wv[searchword]
+		list_words =  model.similar_by_vector(vector, topn=1000, restrict_vocab=None)
+		accum_employee=[]
+		accum_enron_employee =[]
+		accum_org_updated =[]
+		accum_places =[]
+		accum_org = []
+		enron_name = []
+		other_name = []
+		orgs = []
+		places =[]
+		similiar_entity = []
+
+
+		for item in list_words:
+
+			try:
+				if (str(item[0]))in exception:
+					continue
+
+				if (item[0].title == searchword):
+					continue
+
+
+
+				if (fetch_type(str(item[0])) == "PLACE"):
+
+					accum_places.append([item[0].title().encode("utf-8"),item[1]])
+
+				if (fetch_type(str(item[0])) == "ORG"):
+
+					accum_org.append([item[0].title(),item[1]])
+
+				if (fetch_type(str(item[0])) == "PERSON"):
+
+
+					if item[0] in enron_table:
+						accum_enron_employee.append([item[0].title().encode("utf-8"),item[1]])
+					else:
+						accum_employee.append([item[0].title().encode("utf-8"),item[1]])
+		
+			except UnicodeEncodeError:
+				continue
+
+
+		if len(accum_employee) > 10:
+			accum_employee = accum_employee[0:9]
+		if len(accum_enron_employee) > 10:
+			accum_enron_employee = accum_enron_employee[0:9]
+		if len(accum_places) > 5:
+			accum_places = accum_places[0:4]
+
+		if len(accum_org) > 5:
+			accum_org = accum_org[0:4]
+
+		
+
+		if len(accum_employee) !=0:
+			for item in accum_employee:
+				other_name.append(item[0].title().encode("utf-8"))
+
+		if len(accum_enron_employee) !=0:
+			for item in accum_enron_employee:
+				enron_name.append(item[0].title())
+
+		if len(accum_places) !=0:
+			for item in accum_places:
+				places.append(item[0].title())
+
+
+		if len(accum_org) !=0:
+			temp =[]
+			for item in accum_org:
+				temp.append(item[0].title())
+				name = KG_search_for_topic_page(item[0])
+				if name == None:
+					continue
+
+				accum_org_updated.append([name,item[1]])
+				orgs.append(name)
+
+			if len(accum_org_updated) == 0:
+				accum_org_updated = accum_org
+				orgs = temp
+
+		joined_list = accum_employee + accum_org + accum_places + accum_enron_employee
+		joined_list=sorted(joined_list,key=lambda l:l[1], reverse=True)
+
+		Clients_dict =Convert2Dict(accum_employee)
+		Enron_People_dict = Convert2Dict(accum_enron_employee)
+		places_dict = Convert2Dict(accum_places)
+		org_dict = Convert2Dict(accum_org_updated)
+		
+		Separated_with_scores = [Clients_dict,Enron_People_dict,org_dict,places_dict] # Dictionary
+		joined_with_Scores = Convert2Dict(joined_list) #Dictionary
+
+		Separated_without_scores= [other_name,enron_name,orgs,places]
+		joined_without_scores = joined_with_Scores.keys()
+		#now we have scores:
+		#Separated with scores = Separated_with_scores
+		#together with scores  = joined_dict
+
+		#Separated_without_scores = other_name,enron_name,orgs,places
+		print "==========================================================="
+		print "=================== TOPIC : " + searchword.title() +"================="
+		print Separated_without_scores
+
+		list_for_all_entities.append([searchword.title(),Separated_without_scores,])
+	return entity_score_dict,list_for_all_entities
+
+
+# We need to find the distance of all the above entities from center cluster word = oil
 #print GeneralSearch("who is interested in power",[])
 #print GeneralSearch("who has expertise in law",[]) # Works and gives good results
 #print GeneralSearch("who has interest in utility related topics",[])
@@ -1179,6 +1386,8 @@ def TopicSearch(word):
 
 #Search Result Pages Search
 #print OrgSearch("Royal Dutch Shell")
+#print TopicSearch('oil')
+GenerateTopicClusterMap()
 
 
 
