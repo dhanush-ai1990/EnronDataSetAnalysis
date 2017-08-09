@@ -18,7 +18,11 @@ from nltk import ngrams
 import re
 import string
 import os
-
+from graph import DiGraph	
+import algorithms
+#NEW CODE ADDED
+import sqlite3
+#NEW CODE ENDED
 printable = set(string.printable)
 
 
@@ -26,7 +30,7 @@ api_key ='AIzaSyAXSTt536rRbl4dK4pzuPs-QfuGKTT-YBk'
 type_data= ['Corporation','Organization','GovernmentOrganization','EducationalOrganization','LocalBusiness','SportsTeam']
 remove_list = []
 file_loc = '/Users/Dhanush/Desktop/Enron_Data/Search_engine_pickle/'
-org_loc = file_loc +"/Orgs/"
+org_loc = file_loc +"Orgs/"
 
 
 
@@ -53,7 +57,8 @@ exception =[element.lower() for element in exception]
 
 #Lets load the pickles
 
-
+person_node_mapping=joblib.load(file_loc+'person_node_mapping.pkl')
+node_person_mapping=joblib.load(file_loc+'node_person_mapping.pkl')
 mapping_to_type_dict=joblib.load(file_loc+'mapping_to_type_dict.pkl')
 people_interest     =joblib.load(file_loc+'people_interest.pkl')
 org_interest        =joblib.load(file_loc+'org_interest.pkl')
@@ -64,6 +69,35 @@ other_org_table		=joblib.load(file_loc+'other_org_table.pkl')
 SearchEngineWordList=joblib.load(file_loc+'SearchEngineWordList.pkl')
 SearchEngineWordList.pop('hughes')
 SearchEngineWordList.pop('the')
+
+#NEW CODE ADDED
+das_ergebnis=joblib.load(file_loc+'das_ergebnis.pkl')
+
+Database = sqlite3.connect('/Users/Dhanush/Desktop/Enron_Data/Enron_database.db')
+c = Database.cursor()
+
+SQL = "select `EMAIL ID`, FIRST, LAST, `FULL NAME`, ORGANIZATION from `EMPLOYEE`"
+c.execute(SQL)
+
+enron_table = {}
+other_org_table ={}
+for record in c:
+	if record[2] =='**':
+		continue
+	org = record[4].lower()
+	if org == 'enron':
+		enron_table[record[0].lower()] =[]
+		enron_table[record[0].lower()].append('enron')
+		enron_table[record[0].lower()].append(record[3])
+	else:
+		if org not in exception:
+			other_org_table[record[0].lower()] =[]
+			other_org_table[record[0].lower()].append(record[4])
+			other_org_table[record[0].lower()].append(record[3])
+
+
+#NEW CODE ADDED ENDED
+
 
 #lets have a mapping of people to their expertise
 people_expertise ={}
@@ -347,8 +381,13 @@ def fetch_person_details(person,expert_flag,entity_list):
 		else:
 			temp.append(expert)
 
+	if entity_list[0].title() not in expertise:
+		if entity_list[0].title() not in interests:
+			interests.insert(0,entity_list[0].title())
+			
 	expertise = list(set(expertise))
 	interests=list(set(interests))
+
 	name = re.sub(' +',' ',name)
 	email = email.replace(" ", "")
 	return [type1,name,organization,email,expertise,interests]
@@ -402,7 +441,7 @@ def fetch_org_details(org,entity):
 		F.write(" ".join(interests)+"\n")
 		F.write(image+"\n")
 		F.close()
-		return [name,type1,description,url,image,interests]
+		return ["ORG",name,type1,description,url,image,interests]
 	else:
 		return []
 
@@ -453,6 +492,9 @@ def fetch_topic_details(entity):
 	if len(organization_interested) > 6:
 		organization_interested = organization_interested[0:5]
 	return [name,experts,interests,organization_interested]
+
+
+
 
 def fetch_place_details(place):
 	return [place]
@@ -753,13 +795,17 @@ def GeneralSearch(query,restrict):
 		if result[1] == 'PERSON':
 			More_details.append(fetch_person_details(result[0].lower(),expert_flag,entity_list))
 		if result[1] == 'ORG':
-			More_details.append(fetch_org_details(result[0],entity_list))
+			items1 = fetch_org_details(result[0],entity_list)
+			if len(items1) !=0:
+				More_details.append(items1)
+
 
 		if result[1] == 'TOPIC':
 			More_details.append(fetch_topic_details(result[0]))
 
 		if result[1] == 'PLACE':
 			More_details.append(fetch_place_details(result[0]))
+
 
 	if expert_flag =='Y' and len(More_details) == 0:
 		results = experts_dict[entity_list[0]]
@@ -830,9 +876,263 @@ def GeneralSearch(query,restrict):
 		return filter_result,header
 	"""
 
+
+
+
+def GenerateGraph(person1,person2):
+	person1_found = 'N'
+	person2_found = 'N'
+
+	#u'phillip.k': u's2625'
+	print person1
+	print person2
+	try:
+		node1 =person_node_mapping[person1.lower()]
+		person1_found = 'Y'
+	except:
+		print "Person 1 Not found"
+		node1 =u's78' #Janel Guerrero
+
+	try:
+		node2 =person_node_mapping[person2.lower()]
+		person2_found = 'Y'
+	except:
+		print "Person 2 Not found"
+		node2 = u's30018'
+
+	
+	G = DiGraph("net5")
+	
+	# Get the painting object and set its properties.
+	paint = G.painter()
+	#paint.set_source_sink('ada', 'bob')
+	paint.set_source_sink(node1, node2)
+	
+	# load the graph dictionary
+
+	list_of_edges = das_ergebnis['edges']
+	list_of_nodes = das_ergebnis['nodes']
+	for edge in list_of_edges:
+	    source = str(edge['source'])
+	    target = str(edge['target'])
+	    load = float(edge['load'])
+	    G.add_edge(source, target, load)
+	    G.add_edge(target, source, load)
+
+	#G.add_edge('ada', 'sue', 3)
+	#G.add_edge('ada', 'john', 2)
+	#G.add_edge('sue', 'bob', 1)
+	#G.add_edge('a', 'b', 1)
+	#G.add_edge('sue', 'john', 1)
+	#G.add_edge('john', 'bob', 1)
+
+	# Generate the graph using the painter we configured.
+	#G.export(False, paint)
+	
+	# Get 5 shortest paths from the graph.
+	items = algorithms.ksp_yen(G, node1, node2, 5)
+	all_paths = []
+	#items = algorithms.ksp_yen(G, 'ada', 'bob', 5)
+	for path in items:
+	    print "Cost:%s\t%s" % (path['cost'], "->".join(path['path']))
+	    all_paths.append(path['path'])
+
+	print all_paths
+	sub_das_ergebnis = {}
+	sub_das_ergebnis['nodes'] = []
+	sub_das_ergebnis['edges'] = []
+	for sub_dict in list_of_nodes:
+	    for path in all_paths:
+	        for i in range(len(path)):
+	            if path[i] == sub_dict['id']:
+	                if sub_dict not in sub_das_ergebnis['nodes']:
+	                    if i == 0 or i == len(path) - 1:
+	                        sub_dict['root'] = True
+	                        sub_das_ergebnis['nodes'].append(sub_dict)
+	                    else:
+	                        sub_dict['root'] = False
+	                        sub_das_ergebnis['nodes'].append(sub_dict)
+	for sub_dict in list_of_edges:
+	    for path in all_paths:
+	        for i in range(len(path)):
+	            if i < len(path)-1:
+	                if (path[i] == sub_dict['source'] or path[i] == sub_dict['target']) and (path[i+1] == sub_dict['source'] or path[i+1] == sub_dict['target']):
+	                    if sub_dict not in sub_das_ergebnis['edges']:
+	                        sub_das_ergebnis['edges'].append(sub_dict)
+				
+
+
+	#joblib.dump(sub_das_ergebnis, 'sub_das_ergebnis.pkl')   
+	nodes =sub_das_ergebnis['nodes']
+	edges =sub_das_ergebnis['edges']
+
+
+	node_list = []
+
+	count =0
+	for node in nodes:
+		if node['caption'] in enron_table:
+			word = enron_table[node['caption']][1]
+			org = enron_table[node['caption']][0]
+			node_list.append([word,org,node['id']])
+			count+=1
+		elif node['caption'] in other_org_table:
+			word = other_org_table[node['caption']][1]
+			org = other_org_table[node['caption']][0]
+			node_list.append([word,org,node['id']])
+			count+=1
+		else:
+			continue
+
+	edge_list = []
+	connection_exist =[]
+	for edge in edges:
+		source = edge['source']
+		target = edge['target']
+		value = edge['load']
+		value = value/4
+		value1 = int(value*10)
+		value2 = int(value*200)
+		connection_exist.append(edge['source'])
+		connection_exist.append(edge['target'])
+
+		edge_list.append([edge['source'],edge['target'],value1,value2])
+
+	F = open("WorldCup2014.js","w")
+	F.write("var nodes = [") 
+
+	nodes =[]
+	for node in node_list:
+		num = 1
+		if node[0] ==person1:
+			num = 2
+		if node[0] ==person2:
+			num = 3
+
+		string = "{id: " + str(node[2][1:]) + ", label: '" + str(node[0].title()) + "', value: " + str(20) +", group:  " + str(num)+"},"
+		nodes.append(string)
+		#print string
+		F.write(string)
+
+	F.write("];")
+	F.write("var edges = [")
+	edges =[]
+
+	for edge in edge_list:
+		string = "{from: %s, to: %s, value: %s, title: 'Relationship score: %s'}," %(edge[0][1:],edge[1][1:],edge[2],edge[3])
+		edges.append(string)
+		F.write(string)
+
+	F.write("];")
+	F.close()
+
+
+
+	return nodes,edges
+
+
+def entity_With_score(word):
+	vector = model.wv[word]
+	list_words =  model.similar_by_vector(vector, topn=700, restrict_vocab=None)
+	results = []
+	score = 0.50
+	if word in threshold:
+		score = threshold[word]
+	for item in list_words:
+		try:
+
+			if (str(item[0]) == word):
+				continue
+			if (str(item[0])) in exception:
+				continue
+			if (float(item[1]) > score) and (fetch_type(str(item[0])) == "TOPIC"):
+				results.append([str(item[0]),"E",item[1]])
+			if (float(item[1]) < score) and (fetch_type(str(item[0])) == "TOPIC"):
+				results.append([str(item[0]),"I",item[1]])
+		except UnicodeEncodeError:
+			continue
+	return results
+
 # This routine handles the backend for People result page
 def PeopleSearch(word):
-	pass
+
+	person = word.lower()
+	type1='PERSON'
+	name =person.title()
+	organization =""
+	email = ""
+	if person in enron_table:
+		email = enron_table[person][1]
+		test =email.split('@')
+		test = test[1]
+		test = test.split('.')
+		if test[0].lower() != 'enron':
+			organization = test[0].title()
+		else:
+			organization = 'Enron Corporation'
+		if email == "":
+			email_name = person.replace(" ", "")
+			email = email_name + '@enron.com'
+
+
+	elif person in other_org_table:
+		organization = other_org_table[person][0].title()
+		email = other_org_table[person][1]
+	else:
+		organization = ''
+		email_name = person.replace(" ", "")
+		email = ""
+
+
+	results = entity_With_score(person)
+	interests =[]
+	expertise = []
+	for result in results:
+		if result[1] == "E":
+			if len(expertise) < 3:
+				expertise.append([result[0].title(),result[2]])
+		if result[1] == "I":
+			if len(interests) < 3:
+				interests.append([result[0].title(),result[2]])
+	if len(interests) == 0:
+		if person in people_interest:
+			interests = people_interest[person]
+		temp =[]
+		for interest in interests:
+			if interest[0] == 'fraud' or interest[0] == 'internet' or interest[0] == 'commission' or  interest[0] == "frauds":
+				continue
+			else:
+				temp.append(interest)
+		if len(interests) >3:
+			interests = temp[0:3]
+		else:
+			interests=temp
+
+	temp =[]
+	for expert in expertise:
+		if expert == 'fraud' or expert == 'internet' or expert == 'commission' or expert == 'frauds':
+			continue
+		else:
+			temp.append(expert)
+
+
+	name = re.sub(' +',' ',name)
+	email = email.replace(" ", "")
+	expertise =Convert2Dict(expertise)
+	interests =Convert2Dict(interests)
+
+	#Lets generate the path graph
+	person1 = 'Janel Guerrero'
+	#person1 = 'Ginger Dernehl'
+	import time
+	a=time.time()
+	nodes,edges =GenerateGraph(person1.lower(),person)
+	b = time.time()
+	print str(b-a)+" sec"
+	return [name,organization,email,expertise,interests],nodes,edges
+
+
+	#Name of person
 
 
 """
@@ -895,7 +1195,6 @@ def OrgSearch(word):
 
 
 
-	print contact_enron
 
 	additional_interest=[]
 	#We need to get more interests of this organizations
@@ -914,7 +1213,6 @@ def OrgSearch(word):
 	interest = interest + results
 
 
-	print interest
 
 
 	#We need to get the entity cluster map for the organization
@@ -1223,146 +1521,23 @@ def TopicSearch(word):
 	#json = {'name' : word.title(),'employees' :accum_employee, 'colloborators' : accum_enron_employee, 'similiarinterests' :accum_interests ,'places': accum_places,'orgs':accum_org_updated}
 	json = [Clients_dict,Enron_People_dict,places_dict,orgs_dict,similiar_topics_dict]
 
-	json = mean_normalize(json)
-
-	print json
+#	json = mean_normalize(json)
 	return output_array,json
 
 
-
 def GenerateTopicClusterMap():
-	start_word = 'oil'
-	# we need to set the distance of other entities from this cluster
-	# We select a 
-	list_topics = ['gas','fuel','energy','power','transmission','wind','utilities','legal','technology','finance','security','operation','equity','accounting','asset','marketing','administration','revenue','insurance','investment','trade']
-	entity_score = []
-	for entity in list_topics:
-		score =model.similarity(start_word, entity)
-		entity_score.append([entity,score])
+	map_info = [] 
+	list_topics = ['oil','gas','fuel','energy','power','transmission','wind','utilities','legal','technology','finance','security','operation','equity','accounting','asset','marketing','administration','revenue','insurance','investment','trade','insurance','Stock','Pipeline','Electricity','Funding','Sale']
 
-	entity_score=sorted(entity_score,key=lambda l:l[1], reverse=True)
-	entity_score_dict = Convert2Dict(entity_score)
-	dup_person =[]
-	dup_places =[]
-	dup_org =[]
-
-
-	list_for_all_entities = []
-	for item in list_topics:
-		searchword = item.lower()
-		vector = model.wv[searchword]
-		list_words =  model.similar_by_vector(vector, topn=1000, restrict_vocab=None)
-		accum_employee=[]
-		accum_enron_employee =[]
-		accum_org_updated =[]
-		accum_places =[]
-		accum_org = []
-		enron_name = []
-		other_name = []
-		orgs = []
-		places =[]
-		similiar_entity = []
-
-
-		for item in list_words:
-
-			try:
-				if (str(item[0]))in exception:
-					continue
-
-				if (item[0].title == searchword):
-					continue
-
-
-
-				if (fetch_type(str(item[0])) == "PLACE"):
-
-					accum_places.append([item[0].title().encode("utf-8"),item[1]])
-
-				if (fetch_type(str(item[0])) == "ORG"):
-
-					accum_org.append([item[0].title(),item[1]])
-
-				if (fetch_type(str(item[0])) == "PERSON"):
-
-
-					if item[0] in enron_table:
-						accum_enron_employee.append([item[0].title().encode("utf-8"),item[1]])
-					else:
-						accum_employee.append([item[0].title().encode("utf-8"),item[1]])
-		
-			except UnicodeEncodeError:
-				continue
-
-
-		if len(accum_employee) > 10:
-			accum_employee = accum_employee[0:9]
-		if len(accum_enron_employee) > 10:
-			accum_enron_employee = accum_enron_employee[0:9]
-		if len(accum_places) > 5:
-			accum_places = accum_places[0:4]
-
-		if len(accum_org) > 5:
-			accum_org = accum_org[0:4]
-
-		
-
-		if len(accum_employee) !=0:
-			for item in accum_employee:
-				other_name.append(item[0].title().encode("utf-8"))
-
-		if len(accum_enron_employee) !=0:
-			for item in accum_enron_employee:
-				enron_name.append(item[0].title())
-
-		if len(accum_places) !=0:
-			for item in accum_places:
-				places.append(item[0].title())
-
-
-		if len(accum_org) !=0:
-			temp =[]
-			for item in accum_org:
-				temp.append(item[0].title())
-				name = KG_search_for_topic_page(item[0])
-				if name == None:
-					continue
-
-				accum_org_updated.append([name,item[1]])
-				orgs.append(name)
-
-			if len(accum_org_updated) == 0:
-				accum_org_updated = accum_org
-				orgs = temp
-
-		joined_list = accum_employee + accum_org + accum_places + accum_enron_employee
-		joined_list=sorted(joined_list,key=lambda l:l[1], reverse=True)
-
-		Clients_dict =Convert2Dict(accum_employee)
-		Enron_People_dict = Convert2Dict(accum_enron_employee)
-		places_dict = Convert2Dict(accum_places)
-		org_dict = Convert2Dict(accum_org_updated)
-		
-		Separated_with_scores = [Clients_dict,Enron_People_dict,org_dict,places_dict] # Dictionary
-		joined_with_Scores = Convert2Dict(joined_list) #Dictionary
-
-		Separated_without_scores= [other_name,enron_name,orgs,places]
-		joined_without_scores = joined_with_Scores.keys()
-		#now we have scores:
-		#Separated with scores = Separated_with_scores
-		#together with scores  = joined_dict
-
-		#Separated_without_scores = other_name,enron_name,orgs,places
-		print "==========================================================="
-		print "=================== TOPIC : " + searchword.title() +"================="
-		print Separated_without_scores
-
-		list_for_all_entities.append([searchword.title(),Separated_without_scores,])
-	return entity_score_dict,list_for_all_entities
-
+	for topic in list_topics:
+		output_array,json = TopicSearch(topic)
+		[clients,employees,places,orgs,related_topics] = json
+		map_info.append([topic,list(employees),list(related_topics)])
+	return map_info
 
 # We need to find the distance of all the above entities from center cluster word = oil
 #print GeneralSearch("who is interested in power",[])
+#print GeneralSearch("who is interested in Technology",[])
 #print GeneralSearch("who has expertise in law",[]) # Works and gives good results
 #print GeneralSearch("who has interest in utility related topics",[])
 #print GeneralSearch("who has expertise in utility related topics",[])
@@ -1380,6 +1555,7 @@ def GenerateTopicClusterMap():
 #print GeneralSearch("who are the people who deals with RBC Capital Markets",[])
 #print GeneralSearch("who are the people who deals with Statoil",[])
 #print GeneralSearch("What are the interests of Jeana Mac",[])
+#print GeneralSearch("What are the interests of bill white",[])
 #print GeneralSearch("who are the people Jeana Mac deals with ?",[])
 #print GeneralSearch("who are the people from RBC Capital Markets ?",[]) # Need not work, lets not make it too detail.
 
@@ -1387,9 +1563,7 @@ def GenerateTopicClusterMap():
 #Search Result Pages Search
 #print OrgSearch("Royal Dutch Shell")
 #print TopicSearch('oil')
-GenerateTopicClusterMap()
-
-
-
-
+#entity_score_dict,list_for_all_entities = GenerateTopicClusterMap()
+#print GenerateGraph("chakib khelil","Jeana Mac")
+PeopleSearch(u"Edmund cooper")
 
